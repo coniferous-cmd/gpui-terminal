@@ -25,9 +25,7 @@ enum Bone {
     Body,
     /// Bobs, and turns with her head.
     Head,
-    /// An open eye's lid and lash, which a blink squashes; left is 0.
-    Lid(usize),
-    /// An open eye, which looks about as well.
+    /// An open eye, which blinks by squashing and looks about as well; left is 0.
     Iris(usize),
     Arc(usize),
     Lines,
@@ -61,68 +59,50 @@ const fn part(name: &'static str, color: u32, frame: [f32; 4], bone: Bone, shape
 /// Every layer, back to front.
 #[rustfmt::skip]
 const PARTS: &[Part] = &[
-    part("hair-back", 0xEC86B5, [117.0, 45.0, 278.0, 296.0], Bone::Head, r#"<path d="M256 46C192 46 142 90 136 158C131 214 126 262 118 306L118 340L394 340L394 306C386 262 381 214 376 158C370 90 320 46 256 46Z"/>"#),
-    part("shade-back", 0xD9659A, [193.0, 199.0, 126.0, 78.0], Bone::Head, r#"<path d="M194 200C198 238 214 262 230 276L282 276C298 262 314 238 318 200Z"/>"#),
-    part("neck", 0xF7CDBE, [235.0, 221.0, 42.0, 50.0], Bone::Body, r#"<path d="M236 222L276 222L276 266C268 270 244 270 236 266Z"/>"#),
-    part("collar", 0xFFFFFF, [193.0, 255.0, 126.0, 86.0], Bone::Body, r#"<path d="M198 284C204 268 222 258 238 256L256 272L274 256C290 258 308 268 314 284L318 340L194 340Z"/>"#),
-    part("bow", 0xF05A97, [221.0, 247.0, 70.0, 32.0], Bone::Body, r#"<path d="M256 264C244 250 226 248 224 258C222 270 236 278 256 264ZM256 264C268 250 286 248 288 258C290 270 276 278 256 264Z"/>"#),
-    part("knot", 0xD94683, [247.0, 255.0, 18.0, 18.0], Bone::Body, r#"<circle cx="256" cy="264" r="8"/>"#),
-    part("skin", 0xFFE7DC, [177.0, 93.0, 158.0, 152.0], Bone::Head, concat!(r#"<path d=""#, "M178 164C178 116 212 94 256 94C300 94 334 116 334 164C334 202 312 228 284 238C274 242 264 244 256 244C248 244 238 242 228 238C200 228 178 202 178 164Z", r#""/>"#)),
-    part("face-shade", 0xF9D8CB, [161.0, 73.0, 190.0, 118.0], Bone::Head, concat!(r#"<defs><clipPath id="face"><path d=""#, "M178 164C178 116 212 94 256 94C300 94 334 116 334 164C334 202 312 228 284 238C274 242 264 244 256 244C248 244 238 242 228 238C200 228 178 202 178 164Z", r#""/></clipPath></defs><g clip-path="url(#face)"><path transform="translate(0 12)" d=""#, "M170 176C162 110 204 62 256 62C308 62 350 110 342 176Q328 152 318 134Q316 156 304 172Q298 150 286 130Q286 156 274 178Q268 150 256 128Q244 150 238 178Q226 156 226 130Q214 150 208 172Q196 156 194 134Q184 152 170 176Z", r#""/></g>"#)),
-    eye("iris-l", 0xA24FB9, 222.0, 0, r#"<ellipse cx="222" cy="188" rx="18" ry="23"/>"#),
-    eye("ring-l", 0xEE84C4, 222.0, 0, r#"<ellipse cx="222" cy="198" rx="13.5" ry="11.5"/>"#),
-    eye("pupil-l", 0x5A2368, 222.0, 0, r#"<ellipse cx="222" cy="190" rx="7.5" ry="10.5"/>"#),
-    eye("shine-l", 0xFFFFFF, 222.0, 0, r#"<circle cx="215" cy="178" r="7"/><circle cx="229" cy="199" r="3.2"/>"#),
-    Part { name: "lid-l", color: 0x45233F, alpha: 1.0, frame: [193.0, 158.0, 52.0, 26.0], pivot: (222.0, 192.0), bone: Bone::Lid(0), shapes: r#"<path d="M194 182C195 168 208 159 224 159C234 159 241 164 244 172L240 173C236 168 231 165 224 165C214 165 207 172 204 183Z"/>"# },
-    Part { name: "lash-l", color: 0xC2506F, alpha: 0.35, frame: [213.0, 210.0, 18.0, 6.0], pivot: (222.0, 192.0), bone: Bone::Lid(0), shapes: r#"<path fill="none" stroke="black" stroke-width="2" stroke-linecap="round" d="M215 212Q222 214 229 212"/>"# },
-    eye("iris-r", 0xA24FB9, 290.0, 1, r#"<ellipse cx="290" cy="188" rx="18" ry="23"/>"#),
-    eye("ring-r", 0xEE84C4, 290.0, 1, r#"<ellipse cx="290" cy="198" rx="13.5" ry="11.5"/>"#),
-    eye("pupil-r", 0x5A2368, 290.0, 1, r#"<ellipse cx="290" cy="190" rx="7.5" ry="10.5"/>"#),
-    eye("shine-r", 0xFFFFFF, 290.0, 1, r#"<circle cx="283" cy="178" r="7"/><circle cx="297" cy="199" r="3.2"/>"#),
-    Part { name: "lid-r", color: 0x45233F, alpha: 1.0, frame: [267.0, 158.0, 52.0, 26.0], pivot: (290.0, 192.0), bone: Bone::Lid(1), shapes: r#"<path d="M318 182C317 168 304 159 288 159C278 159 271 164 268 172L272 173C276 168 281 165 288 165C298 165 305 172 308 183Z"/>"# },
-    Part { name: "lash-r", color: 0xC2506F, alpha: 0.35, frame: [281.0, 210.0, 18.0, 6.0], pivot: (290.0, 192.0), bone: Bone::Lid(1), shapes: r#"<path fill="none" stroke="black" stroke-width="2" stroke-linecap="round" d="M283 212Q290 214 297 212"/>"# },
-    Part { name: "arc-l", color: 0x45233F, alpha: 1.0, frame: [200.0, 171.0, 44.0, 31.0], pivot: (222.0, 192.0), bone: Bone::Arc(0), shapes: r#"<path fill="none" stroke="black" stroke-width="7" stroke-linecap="round" d="M205 197Q222 176 239 197"/>"# },
-    Part { name: "arc-r", color: 0x45233F, alpha: 1.0, frame: [268.0, 171.0, 44.0, 31.0], pivot: (290.0, 192.0), bone: Bone::Arc(1), shapes: r#"<path fill="none" stroke="black" stroke-width="7" stroke-linecap="round" d="M273 197Q290 176 307 197"/>"# },
-    part("lines", 0x45233F, [201.0, 190.0, 110.0, 8.0], Bone::Lines, r#"<path fill="none" stroke="black" stroke-width="6" stroke-linecap="round" d="M205 194H239M273 194H307"/>"#),
-    Part { name: "blush", color: 0xFF8DAA, alpha: 0.55, frame: [180.0, 206.0, 152.0, 20.0], pivot: (256.0, 216.0), bone: Bone::Blush, shapes: r#"<ellipse cx="198" cy="216" rx="15" ry="8"/><ellipse cx="314" cy="216" rx="15" ry="8"/>"# },
-    mouth("smile", 0xC2506F, [241.0, 219.0, 30.0, 13.0], Mouth::Smile, r#"<path fill="none" stroke="black" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" d="M244 222Q250 229 256 223Q262 229 268 222"/>"#),
-    mouth("grin", 0xC2506F, [242.0, 218.0, 28.0, 24.0], Mouth::Grin, r#"<path d="M243 219Q256 241 269 219Z"/>"#),
-    mouth("tongue", 0xFF8DAA, [248.0, 224.0, 16.0, 13.0], Mouth::Grin, r#"<path d="M249 229Q256 236 263 229Q256 225 249 229Z"/>"#),
-    mouth("gasp", 0xC2506F, [249.0, 218.0, 14.0, 16.0], Mouth::Gasp, r#"<ellipse cx="256" cy="226" rx="5.5" ry="7"/>"#),
-    mouth("flat", 0xC2506F, [246.0, 222.0, 20.0, 6.0], Mouth::Flat, r#"<path fill="none" stroke="black" stroke-width="3.5" stroke-linecap="round" d="M249 225H263"/>"#),
-    mouth("frown", 0xC2506F, [243.0, 217.0, 26.0, 14.0], Mouth::Frown, r#"<path fill="none" stroke="black" stroke-width="3.5" stroke-linecap="round" d="M246 228Q256 220 266 228"/>"#),
-    Part { name: "lock-l", color: 0xF7A6C9, alpha: 1.0, frame: [147.0, 117.0, 54.0, 200.0], pivot: (184.0, 118.0), bone: Bone::Lock(0), shapes: r#"<path d="M184 118C164 150 156 204 160 258C162 282 156 300 148 316C164 312 178 300 186 286C190 256 192 214 198 176C200 152 196 132 184 118Z"/>"# },
-    Part { name: "lock-r", color: 0xF7A6C9, alpha: 1.0, frame: [311.0, 117.0, 54.0, 200.0], pivot: (328.0, 118.0), bone: Bone::Lock(1), shapes: r#"<path d="M328 118C348 150 356 204 352 258C350 282 356 300 364 316C348 312 334 300 326 286C322 256 320 214 314 176C312 152 316 132 328 118Z"/>"# },
-    part("bangs", 0xF7A6C9, [161.0, 61.0, 190.0, 118.0], Bone::Head, concat!(r#"<path d=""#, "M170 176C162 110 204 62 256 62C308 62 350 110 342 176Q328 152 318 134Q316 156 304 172Q298 150 286 130Q286 156 274 178Q268 150 256 128Q244 150 238 178Q226 156 226 130Q214 150 208 172Q196 156 194 134Q184 152 170 176Z", r#""/>"#)),
-    part("gloss", 0xFFD1E4, [195.0, 83.0, 122.0, 26.0], Bone::Head, r#"<path d="M196 108C220 84 292 84 316 108C292 92 220 92 196 108Z"/>"#),
-    Part { name: "ahoge", color: 0xF7A6C9, alpha: 1.0, frame: [237.0, 17.0, 44.0, 50.0], pivot: (258.0, 64.0), bone: Bone::Ahoge, shapes: r#"<path d="M250 66C238 40 252 18 280 20C264 28 258 44 262 64Z"/>"# },
-    part("pin", 0xFFE48A, [303.0, 85.0, 30.0, 30.0], Bone::Head, r#"<path d="M318 86Q320 98 332 100Q320 102 318 114Q316 102 304 100Q316 98 318 86Z"/>"#),
-    part("brows", 0x45233F, [202.0, 148.0, 108.0, 16.0], Bone::Brows, r#"<g fill="none" stroke="black" stroke-width="5" stroke-linecap="round"><path d="M206 160L234 152"/><path d="M306 160L278 152"/></g>"#),
-    part("hand-l", 0xFFE7DC, [149.0, 261.0, 46.0, 26.0], Bone::Hand(0), r#"<path d="M150 286L150 272C150 264 161 264 161 272C161 262 172 262 172 271C172 262 183 262 183 272C183 264 194 264 194 273L194 286Z"/>"#),
-    part("knuckles-l", 0xF2BBA8, [159.0, 271.0, 26.0, 17.0], Bone::Hand(0), r#"<path fill="none" stroke="black" stroke-width="2" stroke-linecap="round" d="M161 274V286M172 273V286M183 274V286"/>"#),
-    part("hand-r", 0xFFE7DC, [317.0, 261.0, 46.0, 26.0], Bone::Hand(1), r#"<path d="M318 286L318 273C318 264 329 264 329 272C329 262 340 262 340 271C340 262 351 262 351 272C351 264 362 264 362 272L362 286Z"/>"#),
-    part("knuckles-r", 0xF2BBA8, [327.0, 271.0, 26.0, 17.0], Bone::Hand(1), r#"<path fill="none" stroke="black" stroke-width="2" stroke-linecap="round" d="M329 274V286M340 273V286M351 274V286"/>"#),
-    mark("bang", 0xFFB020, [368.0, 35.0, 20.0, 75.0], (378.0, 107.0), Mark::Bang, r#"<path d="M371 38L385 38L380 86L376 86Z"/><circle cx="378" cy="100" r="7"/>"#),
-    mark("bang-edge", 0x45233F, [368.0, 35.0, 20.0, 75.0], (378.0, 107.0), Mark::Bang, r#"<g fill="none" stroke="black" stroke-width="3"><path d="M371 38L385 38L380 86L376 86Z"/><circle cx="378" cy="100" r="7"/></g>"#),
-    mark("z1", 0x9FA3D9, [348.0, 66.0, 28.0, 30.0], (362.0, 81.0), Mark::Z1, r#"<path fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M352 70H372L352 92H372"/>"#),
-    mark("z2", 0x9FA3D9, [376.0, 34.0, 22.0, 24.0], (387.0, 46.0), Mark::Z2, r#"<path fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M380 38H394L380 54H394"/>"#),
-    mark("heart", 0xFF5C93, [349.0, 55.0, 58.0, 46.0], (378.0, 82.0), Mark::Heart, r#"<path d="M378 70C366 56 350 66 356 80C360 90 378 100 378 100C378 100 396 90 400 80C406 66 390 56 378 70Z"/>"#),
-    mark("sparkle-l", 0xFFE48A, [123.0, 69.0, 34.0, 34.0], (140.0, 86.0), Mark::SparkleLeft, r#"<path d="M140 70Q143 84 156 86Q143 88 140 102Q137 88 124 86Q137 84 140 70Z"/>"#),
-    mark("sparkle-r", 0xFFE48A, [367.0, 51.0, 26.0, 26.0], (380.0, 64.0), Mark::SparkleRight, r#"<path d="M380 52Q382 62 392 64Q382 66 380 76Q378 66 368 64Q378 62 380 52Z"/>"#),
-    mark("drop", 0x9CD5FF, [336.0, 126.0, 22.0, 32.0], (346.0, 142.0), Mark::Drop, r#"<path d="M346 128Q356 144 350 152Q340 156 338 146Q338 138 346 128Z"/>"#),
-    mark("drop-edge", 0x5AA0D8, [336.0, 126.0, 22.0, 32.0], (346.0, 142.0), Mark::Drop, r#"<path fill="none" stroke="black" stroke-width="2" d="M346 128Q356 144 350 152Q340 156 338 146Q338 138 346 128Z"/>"#),
+    part("hair-back", 0x2A252B, [112.0, 42.0, 288.0, 300.0], Bone::Head, r#"<path d="M256 44C184 44 130 94 128 170C126 224 122 272 116 320C114 332 116 340 116 340L396 340C396 340 398 332 396 320C390 272 386 224 384 170C382 94 328 44 256 44Z"/>"#),
+    part("neck", 0xEFC0B1, [234.0, 224.0, 44.0, 44.0], Bone::Body, r#"<path d="M236 226L276 226L276 260C268 266 244 266 236 260Z"/>"#),
+    part("chest", 0xF6CEBE, [188.0, 258.0, 136.0, 86.0], Bone::Body, r#"<path d="M190 342L194 302C204 278 224 264 256 262C288 264 308 278 318 302L322 342Z"/>"#),
+    part("collar", 0x1B1A1F, [198.0, 254.0, 116.0, 90.0], Bone::Body, r#"<path d="M226 256L220 342L238 342L242 256ZM270 256L274 342L292 342L286 256ZM200 342L202 300C218 288 238 284 256 284C274 284 294 288 310 300L312 342Z"/>"#),
+    part("skin", 0xF9D3C4, [178.0, 94.0, 156.0, 154.0], Bone::Head, r#"<path d="M180 168C180 118 212 96 256 96C300 96 332 118 332 168C332 206 310 232 282 242C272 245 264 246 256 246C248 246 240 245 230 242C202 232 180 206 180 168Z"/>"#),
+    Part { name: "iris-l", color: 0x221A20, alpha: 1.0, frame: [197.0, 172.0, 40.0, 46.0], pivot: (220.0, 194.0), bone: Bone::Iris(0), shapes: r#"<ellipse cx="220" cy="194" rx="15" ry="19"/><path d="M208 178L199 172L209 181Z"/>"# },
+    Part { name: "shine-l", color: 0xFFFFFF, alpha: 1.0, frame: [205.0, 176.0, 24.0, 32.0], pivot: (220.0, 194.0), bone: Bone::Iris(0), shapes: r#"<circle cx="212" cy="184" r="5.5"/><circle cx="226" cy="204" r="2.5"/>"# },
+    Part { name: "iris-r", color: 0x221A20, alpha: 1.0, frame: [275.0, 172.0, 40.0, 46.0], pivot: (292.0, 194.0), bone: Bone::Iris(1), shapes: r#"<ellipse cx="292" cy="194" rx="15" ry="19"/><path d="M296 178L305 172L295 181Z"/>"# },
+    Part { name: "shine-r", color: 0xFFFFFF, alpha: 1.0, frame: [277.0, 176.0, 24.0, 32.0], pivot: (292.0, 194.0), bone: Bone::Iris(1), shapes: r#"<circle cx="284" cy="184" r="5.5"/><circle cx="298" cy="204" r="2.5"/>"# },
+    Part { name: "arc-l", color: 0x221A20, alpha: 1.0, frame: [198.0, 170.0, 44.0, 34.0], pivot: (220.0, 194.0), bone: Bone::Arc(0), shapes: r#"<path fill="none" stroke="black" stroke-width="6" stroke-linecap="round" d="M204 198Q220 184 236 198"/>"# },
+    Part { name: "arc-r", color: 0x221A20, alpha: 1.0, frame: [274.0, 170.0, 44.0, 34.0], pivot: (292.0, 194.0), bone: Bone::Arc(1), shapes: r#"<path fill="none" stroke="black" stroke-width="6" stroke-linecap="round" d="M278 198Q294 184 310 198"/>"# },
+    part("lines", 0x221A20, [200.0, 192.0, 116.0, 8.0], Bone::Lines, r#"<path fill="none" stroke="black" stroke-width="5" stroke-linecap="round" d="M204 196H236M280 196H312"/>"#),
+    part("brows", 0x2A252B, [202.0, 162.0, 108.0, 16.0], Bone::Brows, r#"<g fill="none" stroke="black" stroke-width="4" stroke-linecap="round"><path d="M206 172Q218 164 232 167"/><path d="M306 172Q294 164 280 167"/></g>"#),
+    part("nose", 0xD1988C, [249.0, 202.0, 16.0, 11.0], Bone::Head, r#"<path fill="none" stroke="black" stroke-width="3" stroke-linecap="round" d="M252 206Q257 211 262 205"/>"#),
+    Part { name: "blush", color: 0xFF8FA6, alpha: 0.55, frame: [182.0, 204.0, 148.0, 20.0], pivot: (256.0, 214.0), bone: Bone::Blush, shapes: r#"<ellipse cx="200" cy="214" rx="16" ry="8"/><ellipse cx="312" cy="214" rx="16" ry="8"/>"# },
+    mouth("smile", 0x8F4E54, [239.0, 221.0, 28.0, 19.0], Mouth::Smile, r#"<path fill="none" stroke="black" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M242 225Q248 231 253 225Q258 232 264 224"/><path d="M252 230L254 238L257 230Z"/>"#),
+    mouth("grin", 0x8F4E54, [240.0, 222.0, 32.0, 24.0], Mouth::Grin, r#"<path d="M242 224Q256 244 270 224Z"/>"#),
+    mouth("tongue", 0xFF8FA6, [247.0, 228.0, 18.0, 14.0], Mouth::Grin, r#"<path d="M249 233Q256 240 263 233Q256 229 249 233Z"/>"#),
+    mouth("gasp", 0x8F4E54, [249.0, 224.0, 14.0, 16.0], Mouth::Gasp, r#"<ellipse cx="256" cy="232" rx="5.5" ry="7"/>"#),
+    mouth("flat", 0x8F4E54, [246.0, 227.0, 20.0, 6.0], Mouth::Flat, r#"<path fill="none" stroke="black" stroke-width="3" stroke-linecap="round" d="M248 230H264"/>"#),
+    mouth("frown", 0x8F4E54, [244.0, 223.0, 24.0, 14.0], Mouth::Frown, r#"<path fill="none" stroke="black" stroke-width="3" stroke-linecap="round" d="M246 234Q256 226 266 234"/>"#),
+    Part { name: "lock-l", color: 0x2A252B, alpha: 1.0, frame: [154.0, 114.0, 62.0, 208.0], pivot: (202.0, 118.0), bone: Bone::Lock(0), shapes: r#"<path d="M202 116C186 148 176 208 174 260C173 284 166 302 156 320C174 312 188 296 196 278C200 240 204 188 214 148C218 128 212 118 202 116Z"/>"# },
+    Part { name: "lock-r", color: 0x2A252B, alpha: 1.0, frame: [296.0, 114.0, 62.0, 208.0], pivot: (310.0, 118.0), bone: Bone::Lock(1), shapes: r#"<path d="M310 116C326 148 336 208 338 260C339 284 346 302 356 320C338 312 324 296 316 278C312 240 308 188 298 148C294 128 300 118 310 116Z"/>"# },
+    part("bangs", 0x2A252B, [158.0, 54.0, 196.0, 114.0], Bone::Head, r#"<path d="M168 160C160 100 204 56 256 56C308 56 352 100 344 160C336 140 328 128 320 116C316 136 310 148 302 160C296 138 288 122 280 110C278 132 272 148 266 164C262 140 258 124 256 112C254 124 250 140 246 164C240 148 234 132 232 110C224 122 216 138 210 160C202 148 196 136 192 116C184 128 176 140 168 160Z"/>"#),
+    part("gloss", 0x4A424E, [195.0, 69.0, 122.0, 26.0], Bone::Head, r#"<path fill="none" stroke="black" stroke-width="3" stroke-linecap="round" d="M198 92Q218 74 244 72M270 72Q296 76 314 92"/>"#),
+    part("petals", 0xF2F7FF, [130.0, 54.0, 76.0, 76.0], Bone::Head, r#"<ellipse cx="168" cy="72" rx="9" ry="16"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(45 168 92)"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(90 168 92)"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(135 168 92)"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(180 168 92)"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(225 168 92)"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(270 168 92)"/><ellipse cx="168" cy="72" rx="9" ry="16" transform="rotate(315 168 92)"/>"#),
+    part("flower-center", 0x9FD79A, [157.0, 81.0, 22.0, 22.0], Bone::Head, r#"<circle cx="168" cy="92" r="9"/><path fill="none" stroke="black" stroke-width="2" stroke-linecap="round" d="M163 88H173M161 93H175M164 98H172M166 85V99M171 86V98"/>"#),
+    Part { name: "ahoge", color: 0x2A252B, alpha: 1.0, frame: [254.0, 18.0, 44.0, 50.0], pivot: (268.0, 64.0), bone: Bone::Ahoge, shapes: r#"<path d="M264 64C256 42 268 20 294 22C278 30 270 46 272 64Z"/>"# },
+    part("hand-l", 0xF9D3C4, [152.0, 260.0, 48.0, 84.0], Bone::Hand(0), r#"<path d="M154 342L154 274C154 265 165 265 165 274C165 263 176 263 176 273C176 263 187 263 187 274C187 266 198 266 198 276L198 342Z"/>"#),
+    part("hand-r", 0xF9D3C4, [326.0, 110.0, 72.0, 234.0], Bone::Hand(1), r#"<path d="M336 342L334 210C331 192 334 177 344 169L331 127C328 117 338 112 342 122L353 159L361 123C363 113 374 114 375 125L380 173C390 169 396 180 389 188C397 192 395 202 387 204C381 217 375 227 369 233L367 342Z"/>"#),
+    mark("bang", 0xFFB020, [383.0, 28.0, 18.0, 75.0], (392.0, 100.0), Mark::Bang, r#"<path d="M385 30L399 30L394 80L390 80Z"/><circle cx="392" cy="94" r="7"/>"#),
+    mark("bang-edge", 0x2A252B, [382.0, 27.0, 19.0, 76.0], (392.0, 100.0), Mark::Bang, r#"<g fill="none" stroke="black" stroke-width="3"><path d="M385 30L399 30L394 80L390 80Z"/><circle cx="392" cy="94" r="7"/></g>"#),
+    mark("z1", 0xB8BEEA, [352.0, 48.0, 30.0, 32.0], (367.0, 64.0), Mark::Z1, r#"<path fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M356 52H378L356 76H378"/>"#),
+    mark("z2", 0xB8BEEA, [378.0, 22.0, 22.0, 24.0], (389.0, 34.0), Mark::Z2, r#"<path fill="none" stroke="black" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M382 26H396L382 42H396"/>"#),
+    mark("heart", 0xFF6B9D, [346.0, 52.0, 52.0, 44.0], (372.0, 78.0), Mark::Heart, r#"<path d="M372 66C364 54 348 62 354 76C358 86 372 94 372 94C372 94 386 86 390 76C396 62 380 54 372 66Z"/>"#),
+    mark("sparkle-l", 0xFFE48A, [116.0, 86.0, 24.0, 28.0], (128.0, 100.0), Mark::SparkleLeft, r#"<path d="M128 88Q130 97 138 100Q130 103 128 112Q126 103 118 100Q126 97 128 88Z"/>"#),
+    mark("sparkle-r", 0xFFE48A, [384.0, 48.0, 16.0, 20.0], (392.0, 58.0), Mark::SparkleRight, r#"<path d="M392 50Q394 56 398 58Q394 60 392 66Q390 60 386 58Q390 56 392 50Z"/>"#),
+    mark("drop", 0x9CD5FF, [309.0, 112.0, 22.0, 33.0], (319.0, 128.0), Mark::Drop, r#"<path d="M319 114Q329 130 323 139Q313 143 311 133Q311 124 319 114Z"/>"#),
+    mark("drop-edge", 0x5AA0D8, [308.0, 111.0, 24.0, 35.0], (319.0, 128.0), Mark::Drop, r#"<path fill="none" stroke="black" stroke-width="2" d="M319 114Q329 130 323 139Q313 143 311 133Q311 124 319 114Z"/>"#),
 ];
-
-/// A layer of an open eye centred at `x`.
-#[rustfmt::skip]
-const fn eye(name: &'static str, color: u32, x: f32, side: usize, shapes: &'static str) -> Part {
-    let frame = [x - 19.0, 164.0, 38.0, 48.0];
-    Part { name, color, alpha: 1.0, frame, pivot: (x, 192.0), bone: Bone::Iris(side), shapes }
-}
 
 #[rustfmt::skip]
 const fn mouth(name: &'static str, color: u32, frame: [f32; 4], mouth: Mouth, shapes: &'static str) -> Part {
-    Part { name, color, alpha: 1.0, frame, pivot: (256.0, 224.0), bone: Bone::Mouth(mouth), shapes }
+    Part { name, color, alpha: 1.0, frame, pivot: (256.0, 228.0), bone: Bone::Mouth(mouth), shapes }
 }
 
 #[rustfmt::skip]
@@ -192,7 +172,6 @@ fn moved(
     Some(match part.bone {
         Bone::Body => (whole, 1.0),
         Bone::Head => (head, 1.0),
-        Bone::Lid(side) if open(side) => (squash(side, pose.wide), 1.0),
         Bone::Iris(side) if open(side) => (shift(squash(side, pose.wide), by(pose.look)), 1.0),
         Bone::Arc(side) if shut(side) => (squash(side, 1.0), 1.0),
         Bone::Lines if pose.eyes == Eyes::Lines => (head, 1.0),
