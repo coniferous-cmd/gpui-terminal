@@ -8,6 +8,8 @@ use super::{look::Mark, *};
 fn ely(mood: Mood, since: Instant) -> Pet {
     Pet {
         rig: Rc::new(Rig::new()),
+        pointer: Default::default(),
+        gaze: Default::default(),
         mood,
         since,
         shown: since - Duration::from_secs(60),

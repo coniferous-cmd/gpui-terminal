@@ -89,6 +89,7 @@ pub fn bind_keys(cx: &mut App) {
 /// The main window's content: sessions, the terminal, and Git or Files, in Ely's columns.
 pub struct Workspace {
     focus: FocusHandle,
+    pub(crate) pointer: crate::pet::gaze::Pointer,
     sessions: Vec<Session>,
     /// The session shown.
     active: usize,
@@ -121,6 +122,7 @@ impl Workspace {
         });
         let mut workspace = Self {
             focus: cx.focus_handle(),
+            pointer: Default::default(),
             sessions: Vec::new(),
             active: 0,
             files: cx.new(|_| Files::new(launch.cwd.clone())),
@@ -454,6 +456,7 @@ impl Render for Workspace {
         // The context sits above the focus root, so its keys work wherever focus is.
         div()
             .size_full()
+            .child(self.pointer.listener(crate::pet::gaze::Source::Main))
             .key_context(CONTEXT)
             .map(menus::window_actions)
             .on_action(cx.listener(|this, _: &ToggleSessions, _, cx| {

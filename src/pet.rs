@@ -1,11 +1,13 @@
 //! Ely, the icon's girl, peeking over the main window's top edge from a window of her own, or up from its bottom edge where no room lies above.
 
+pub(crate) mod gaze;
 mod look;
 #[cfg(target_os = "macos")]
 mod macos;
 mod rig;
 #[cfg(test)]
 mod tests;
+mod view;
 #[cfg(windows)]
 mod windows;
 #[cfg(target_os = "linux")]
@@ -18,10 +20,9 @@ use std::{
 };
 
 use gpui::{
-    App, AppContext as _, Bounds, Context, Decorations, DispatchPhase, InteractiveElement,
-    IntoElement, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, ParentElement, Pixels,
-    Point, Render, Styled, Subscription, Window, WindowBackgroundAppearance, WindowBounds,
-    WindowHandle, WindowKind, WindowOptions, canvas, div, point, popup, px, size,
+    App, AppContext as _, Bounds, Decorations, Pixels, Point, Subscription, Window,
+    WindowBackgroundAppearance, WindowBounds, WindowHandle, WindowKind, WindowOptions, point,
+    popup, px, size,
 };
 
 #[cfg(target_os = "macos")]
@@ -56,6 +57,8 @@ type Shown = Rc<RefCell<Option<WindowHandle<Pet>>>>;
 /// Ely in her window: she moves all the time, her acts follow the sessions' marks, and a press pets her.
 pub struct Pet {
     rig: Rc<Rig>,
+    pointer: gaze::Pointer,
+    gaze: gaze::Gaze,
     mood: Mood,
     /// When the mood began, when she came, and when she was last pressed.
     since: Instant,
@@ -120,7 +123,10 @@ fn open_pet(main: WindowHandle<Workspace>, cx: &mut App) -> Option<WindowHandle<
 fn close(pet: WindowHandle<Pet>, why: &str, cx: &mut App) {
     log::info!("pet: Ely goes, {why}");
     if pet
-        .update(cx, |_, window, _| window.remove_window())
+        .update(cx, |pet, window, _| {
+            pet.pointer.leave(gaze::Source::Pet);
+            window.remove_window();
+        })
         .is_err()
     {
         log::debug!("pet: her window had gone");
@@ -249,6 +255,8 @@ fn show(main: WindowHandle<Workspace>, cx: &mut App) -> anyhow::Result<WindowHan
             });
             Pet {
                 rig: Rc::new(Rig::new()),
+                pointer: workspace.read(cx).pointer.clone(),
+                gaze: Default::default(),
                 mood: start,
                 since: Instant::now(),
                 shown: Instant::now(),
@@ -452,43 +460,5 @@ impl Pet {
         if visible {
             self.place(main);
         }
-    }
-}
-
-impl Render for Pet {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let pose = self.pose(Instant::now());
-        // gpui gives a hidden window no frames, so she rests while unseen.
-        window.request_animation_frame();
-        let rig = self.rig.clone();
-        let this = cx.entity();
-        let drawn = canvas(
-            |_, _, _| {},
-            move |bounds, _, window, cx| {
-                let head = point(bounds.origin.x, bounds.origin.y + px(ROOM));
-                rig.paint(head, &pose, window, cx);
-                // Her window keeps the pointer while the button is held, inside it or not.
-                let held = this.clone();
-                window.on_mouse_event(move |event: &MouseMoveEvent, phase, window, cx| {
-                    if phase == DispatchPhase::Bubble && event.dragging() {
-                        let scale = window.scale_factor();
-                        held.update(cx, |pet, cx| pet.slide(event.position.x, scale, cx));
-                    }
-                });
-                window.on_mouse_event(move |event: &MouseUpEvent, phase, _, cx| {
-                    if phase == DispatchPhase::Bubble && event.button == MouseButton::Left {
-                        this.update(cx, |pet, cx| pet.release(cx));
-                    }
-                });
-            },
-        );
-        div().size_full().child(drawn.size_full()).on_mouse_down(
-            MouseButton::Left,
-            cx.listener(|pet, event: &MouseDownEvent, window, cx| {
-                pet.press(Instant::now());
-                pet.grab(event.position.x, window.scale_factor());
-                cx.notify();
-            }),
-        )
     }
 }
