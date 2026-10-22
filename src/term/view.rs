@@ -265,7 +265,14 @@ impl TerminalView {
                 PtyEvent::Term(event) => self.term_event(event, cx),
                 PtyEvent::Mouse(mode) => self.mouse = mode,
                 #[cfg(windows)]
-                PtyEvent::Win32(on) => self.win32 = on,
+                PtyEvent::Win32(on) => {
+                    self.win32 = on && self.pty.win32_input;
+                    log::info!(
+                        "terminal {}: win32-input-mode requested {on}, enabled {}",
+                        self.pty.pid,
+                        self.win32
+                    );
+                }
                 PtyEvent::Mark(Mark::Done(status)) => self.finished(status, cx),
                 // A new prompt ends what was working, waiting or idle; done and error stay.
                 PtyEvent::Mark(Mark::Prompt(click)) => {

@@ -70,6 +70,8 @@ pub struct Pty {
     pub term: Arc<FairMutex<Term<Listener>>>,
     pub pid: u32,
     pub quote: Quote,
+    #[cfg(windows)]
+    pub win32_input: bool,
     notifier: Notifier,
     #[cfg(unix)]
     master: std::fs::File,
@@ -125,6 +127,8 @@ pub fn spawn(
             launch.cwd.display()
         )
     })?;
+    #[cfg(windows)]
+    let win32_input = super::win32::supported()?;
     let pid = child_id(&raw)?;
     #[cfg(unix)]
     let master = raw
@@ -156,6 +160,8 @@ pub fn spawn(
             term,
             pid,
             quote: launch.quote,
+            #[cfg(windows)]
+            win32_input,
             notifier,
             #[cfg(unix)]
             master,

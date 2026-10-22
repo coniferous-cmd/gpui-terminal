@@ -20,6 +20,33 @@ use super::keys::Action;
 /// The mode ConPTY sets, `CSI ? 9001 h`.
 pub const MODE: u32 = 9001;
 
+/// The outer ConPTY must decode records even when an inner program asks for them.
+pub fn supported() -> anyhow::Result<bool> {
+    use windows_sys::{
+        Wdk::System::SystemServices::RtlGetVersion,
+        Win32::System::{LibraryLoader::GetModuleHandleW, SystemInformation::OSVERSIONINFOW},
+        w,
+    };
+    let mut version: OSVERSIONINFOW = unsafe { std::mem::zeroed() };
+    version.dwOSVersionInfoSize = size_of::<OSVERSIONINFOW>() as u32;
+    let status = unsafe { RtlGetVersion(&mut version) };
+    anyhow::ensure!(
+        status == 0,
+        "terminal input: RtlGetVersion failed with {status:#x}"
+    );
+    let bundled = !unsafe { GetModuleHandleW(w!("conpty.dll")) }.is_null();
+    let supported = host_supports_records(version.dwBuildNumber, bundled);
+    log::info!(
+        "terminal input: Windows build {}, bundled ConPTY {bundled}, win32 records {supported}",
+        version.dwBuildNumber
+    );
+    Ok(supported)
+}
+
+fn host_supports_records(build: u32, bundled: bool) -> bool {
+    bundled || build >= 22000
+}
+
 /// `keystroke` as ConPTY reads it, `CSI Vk ; Sc ; Uc ; Kd ; Cs ; Rc _`; none for a key no virtual key names.
 pub fn record(keystroke: &Keystroke, action: Action) -> Option<Vec<u8>> {
     let (key, enhanced) = virtual_key(&keystroke.key)?;
@@ -138,6 +165,14 @@ fn control(enhanced: bool) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn system_conpty_on_windows_10_does_not_decode_records() {
+        assert!(!host_supports_records(19045, false));
+        assert!(host_supports_records(22000, false));
+        assert!(host_supports_records(26100, false));
+        assert!(host_supports_records(19045, true));
+    }
 
     #[test]
     fn named_keys_and_letters_find_their_virtual_keys() {
