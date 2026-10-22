@@ -45,11 +45,11 @@ The app writes its log to stderr. `RUST_LOG=elyterminal=debug` writes more; `tra
 - A scrollbar along the terminal's right edge scrolls its history, even while a program takes the wheel.
 - Shell integration for zsh, bash, fish and PowerShell: each prompt reports its folder and title, and OSC 133 marks each prompt, each command and its exit status.
 - Ely peeks over the window's top edge, or up from its bottom left when the window leaves her no room above it, and moves all the time: she breathes, sways and blinks. She follows your sessions: she hops when a program waits on you, shakes at an error, cheers a finish, reads along while a program works, and dozes when all is calm for long. Press her and she winks, waking her from a doze. Drag her along the edge to move her. Settings › Terminal › Ely turns her off.
-- Sessions: new, close and switch. A bell marks a hidden session's row and makes no sound. A row's mark shows what its programs report through OSC 7501, OSC 9;4 or herdr: waiting on you, an error, work with its progress, done or idle, else a failed last command. The mark is 3 by 3 dots: work ripples and waiting dips while they last. Hover over the mark lists each report.
-- Notifications: while the window is in the background or the session hidden, a session that starts waiting, finishes or fails, and a program's OSC 9, 777 or 99, post a system notification, one a session every 3 seconds at most; a press shows the session. On macOS only the app bundle posts them, not `cargo run`.
+- Sessions group independent terminal tabs. The tab bar creates, switches, closes and reorders tabs; switching sessions restores the last selected tab. Closing or exiting the last tab removes its session, and the last session closes the window. Closing a session with multiple tabs asks first. A bell in an unseen tab marks its session's row and makes no sound. A row's mark shows what its programs report through OSC 7501, OSC 9;4 or herdr: waiting on you, an error, work with its progress, done or idle, else a failed last command. The mark is 3 by 3 dots: work ripples and waiting dips while they last. Hover over the mark lists each report.
+- Notifications: while the window is in the background or the tab hidden, a terminal that starts waiting, finishes or fails, and a program's OSC 9, 777 or 99, post a system notification, one a terminal every 3 seconds at most; a press shows its session and exact tab. On macOS only the app bundle posts them, not `cargo run`.
 - Cmd-Up and Cmd-Down, Ctrl-Shift-Up and Ctrl-Shift-Down off macOS, jump to the prompt before or after the view's top.
 - A button at each end of the title bar hides or shows its side column, and a drag on the border between a side column and the terminal resizes it; the window opens as it was left, at the size and widths it was left at. On Windows and Linux a gear beside the right one opens Settings.
-- Files shows the session's folder as a tree with Git's marks. Inside herdr the folder is that of herdr's focused pane.
+- Files and Git follow the selected tab's folder; Files shows it as a tree with Git's marks. Inside herdr the folder is that of herdr's focused pane.
 - Git shows the branch, stages, unstages, discards, commits, lists recent commits and opens diffs, all through the `git` command line.
 - Themes: Ely Dark, Ely Light, Catppuccin Mocha, Macchiato, Frappé and Latte, Tokyo Night, Dracula, Nord, Gruvbox Dark, Rosé Pine, Solarized Light, One Light and Kanagawa Wave. A second theme can take over while the system is dark. On Omarchy 4, an Omarchy theme follows the system's theme as it switches, and is the default there.
 - Background opacity and blur: NSVisualEffectView on macOS, acrylic on Windows, `ext_background_effect_v1` or `org_kde_kwin_blur` on Wayland, `_KDE_NET_WM_BLUR_BEHIND_REGION` on X11, which KWin reads. Blur shows only while the opacity is under 100%. Hyprland blurs only while its own `decoration:blur:enabled` is on, and Omarchy 4.0.4 turns it off; to turn it on there, add `hl.config({ decoration = { blur = { enabled = true } } })` to `~/.config/hypr/looknfeel.lua`.
@@ -60,10 +60,13 @@ Settings › Terminal lists them all, as this platform binds them.
 
 | | macOS | Windows and Linux |
 |---|---|---|
-| New session | Cmd-T | Ctrl-Shift-T |
-| Close session | Cmd-W | Ctrl-Shift-W |
-| Session 1 to 8, last | Cmd-1 to Cmd-8, Cmd-9 | Alt-1 to Alt-8, Alt-9 |
-| Next, previous session | Ctrl-Tab, Ctrl-Shift-Tab | Ctrl-Tab, Ctrl-Shift-Tab |
+| New tab | Cmd-T | Ctrl-Shift-T |
+| Close tab | Cmd-W | Ctrl-Shift-W |
+| Tab 1 to 8, last | Cmd-1 to Cmd-8, Cmd-9 | Alt-1 to Alt-8, Alt-9 |
+| Next, previous tab | Ctrl-Tab, Ctrl-Shift-Tab | Ctrl-Tab, Ctrl-Shift-Tab |
+| New session | Cmd-Shift-N | Ctrl-Shift-N |
+| Close session | Cmd-Shift-W | Ctrl-Shift-Alt-W |
+| Next, previous session | Cmd-Shift-PageDown, Cmd-Shift-PageUp | Ctrl-Shift-PageDown, Ctrl-Shift-PageUp |
 | Sessions column | Cmd-B | Ctrl-Shift-B |
 | Right column | Cmd-Alt-B | Ctrl-Shift-Alt-B |
 | Copy, paste | Cmd-C, Cmd-V | Ctrl-Shift-C, Ctrl-Shift-V; on Windows Ctrl-V pastes too |

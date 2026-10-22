@@ -17,8 +17,8 @@ use crate::{
     term::input::{self, Find, NextPrompt, PreviousPrompt},
     updates::{self, Updates, VERSION},
     workspace::{
-        self, CloseSession, LastSession, NewSession, NextSession, PreviousSession, SelectSession,
-        TogglePanel, ToggleSessions,
+        self, CloseSession, CloseTab, LastTab, NewSession, NewTab, NextSession, NextTab,
+        PreviousSession, PreviousTab, SelectTab, TogglePanel, ToggleSessions,
     },
 };
 
@@ -30,7 +30,7 @@ const OPTIONS: [(OptionAsAlt, &str, &str); 4] = [
     (OptionAsAlt::Both, "both", "Both"),
 ];
 
-/// The names of the sessions a digit shows.
+/// The names of the tabs a digit shows.
 const PLACES: [&str; 8] = [
     "Session 1",
     "Session 2",
@@ -60,7 +60,7 @@ impl SettingsWindow {
         };
         let start = SegmentedControl::new("settings-start-in", start)
             .segment("home", "Home", None)
-            .segment("session", "Session's folder", None)
+            .segment("session", "Current tab's folder", None)
             .size(ControlSize::Sm)
             .on_change({
                 let this = this.clone();
@@ -171,7 +171,7 @@ fn updates_row(cx: &App) -> SettingsRow {
         .control(control)
 }
 
-/// Where new sessions start, as the settings keep it.
+/// Where new terminals start, as the settings keep it.
 fn start_in(this: &Entity<SettingsWindow>, value: &SharedString, cx: &mut App) {
     let start = match value.as_ref() {
         "home" => StartIn::Home,
@@ -180,7 +180,7 @@ fn start_in(this: &Entity<SettingsWindow>, value: &SharedString, cx: &mut App) {
     };
     set(
         this,
-        format!("new sessions start in {start:?}"),
+        format!("new terminals start in {start:?}"),
         cx,
         |settings| settings.start_in = start,
     );
@@ -189,6 +189,10 @@ fn start_in(this: &Entity<SettingsWindow>, value: &SharedString, cx: &mut App) {
 /// The listed commands, in order: group, name and action.
 fn listed() -> Vec<(&'static str, &'static str, Box<dyn Action>)> {
     let mut listed = vec![
+        ("Tabs", "New tab", NewTab.boxed_clone()),
+        ("Tabs", "Close tab", CloseTab.boxed_clone()),
+        ("Tabs", "Next tab", NextTab.boxed_clone()),
+        ("Tabs", "Previous tab", PreviousTab.boxed_clone()),
         ("Sessions", "New session", NewSession.boxed_clone()),
         ("Sessions", "Close session", CloseSession.boxed_clone()),
         ("Sessions", "Next session", NextSession.boxed_clone()),
@@ -199,9 +203,9 @@ fn listed() -> Vec<(&'static str, &'static str, Box<dyn Action>)> {
         ),
     ];
     let places = PLACES.iter().enumerate();
-    listed.extend(places.map(|(ix, name)| ("Sessions", *name, SelectSession(ix).boxed_clone())));
+    listed.extend(places.map(|(ix, name)| ("Tabs", *name, SelectTab(ix).boxed_clone())));
     listed.extend([
-        ("Sessions", "Last session", LastSession.boxed_clone()),
+        ("Tabs", "Last tab", LastTab.boxed_clone()),
         ("Edit", "Copy", Copy.boxed_clone()),
         ("Edit", "Paste", Paste.boxed_clone()),
         ("Edit", "Select all", SelectAll.boxed_clone()),

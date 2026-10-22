@@ -79,19 +79,20 @@ Ghostty is the bar for what the terminal does. ELYTerminal owns its engine on `a
 
 ## 7. Sessions panel
 
-- A list of sessions. Each row: title, then the working directory, home as `~`.
-- New session (+ and Cmd-T), close (row's ×, Cmd-W), select (press, Cmd-1…9, Ctrl-Tab and Ctrl-Shift-Tab).
+- A list of sessions, each grouping independent terminal tabs. Each row: title, then the selected tab's working directory, home as `~`, and the tab count.
+- New session (sidebar + and Cmd-Shift-N), close (row's ×, Cmd-Shift-W), select (press or Cmd-Shift-PageUp/PageDown); closing a session with multiple tabs asks first. Windows and Linux use Ctrl-Shift-N, Ctrl-Shift-Alt-W and Ctrl-Shift-PageUp/PageDown.
+- A browser-style tab bar above the terminal: add, select, close and drag to reorder. Cmd-T adds a tab, Cmd-W closes it, Cmd-1…9 selects it, Ctrl-Tab and Ctrl-Shift-Tab cycle tabs; off macOS, Ctrl-Shift-T/W and Alt-1…9. Each session retains its selected tab.
 - Rename: a double press on a row's title opens a field in its place; Enter keeps the name, Escape drops it. The name shows in the row, the terminal's header and the window's title over the program's own until renamed again; an empty name gives the title back to the program.
-- A session whose program ends closes its row. The last row closing closes the window.
-- A bell in a hidden session marks its row.
+- A tab whose program ends closes. Closing or exiting the last tab automatically closes its session. The last session closing closes the window.
+- A bell in an unseen tab marks its session's row until that tab is shown. A session's status aggregates all its tabs, with waiting, error, working, done and idle in that priority order.
 - A row shows its session's status: working, with its progress where known; waiting on the user, for a permission, a question or a login; done; error; and a mark when the last command failed. Hover shows each record's program, title and message. A hidden session that starts waiting marks its row until it is shown.
 - The mark is 3 by 3 dots that move: work ripples, or fills by its progress; waiting dips; a settled state draws its shape, then holds still.
-- System notifications on macOS, Windows and Linux: a session that starts waiting, finishes or fails, and a program's OSC 9, 777 or 99 notification, post one while the window is not active or the session is hidden, one a session every 3 seconds at most; it names the session, and a press on it shows the window and the session. On macOS only the app bundle posts them.
+- System notifications on macOS, Windows and Linux: a terminal that starts waiting, finishes or fails, and a program's OSC 9, 777 or 99 notification, post one while the window is not active or the tab is hidden, one a terminal every 3 seconds at most; a press shows the window, owning session and exact tab. On macOS only the app bundle posts them.
 
 ## 8. Right panel: Files
 
 - A switch at the top, centered below the title bar: Git, Files.
-- Files shows the active session's working directory as a tree, folders first, Git status colors on names.
+- Files and Git follow the selected tab's working directory. Files shows it as a tree, folders first, Git status colors on names.
 - Double press: a folder opens, a file opens in the system's default app.
 - It reloads when the session reports a new directory and at each prompt.
 
@@ -136,7 +137,7 @@ Cmd-, opens it; on Windows and Linux, which have no menu bar, so does a gear in 
 
 ## 12. Menus and shortcuts
 
-- macOS menu bar: ELYTerminal (Settings, Quit), Shell (New Session, Close Session), Edit (Copy, Paste, Select All, Find), View (Toggle Sessions, Toggle Right Panel, Bigger, Smaller, Reset Size), Window.
+- macOS menu bar: ELYTerminal (Settings, Quit), Shell (New Tab, Close Tab, New Session, Close Session), Edit (Copy, Paste, Select All, Find), View (Toggle Sessions, Toggle Right Panel, Bigger, Smaller, Reset Size), Window.
 - The same shortcuts on Windows and Linux with Ctrl-Shift for terminal-colliding keys. On Windows Ctrl-V pastes too, as in Windows Terminal.
 
 ## 13. Acceptance
@@ -159,4 +160,4 @@ Cmd-, opens it; on Windows and Linux, which have no menu bar, so does a gear in 
 
 ## Deferred
 
-Splits, tabs inside a session, profiles, key rebinding, kitty graphics, sixel, session restore, push and pull, quick terminal.
+Splits, profiles, key rebinding, kitty graphics, sixel, session restore, push and pull, quick terminal.

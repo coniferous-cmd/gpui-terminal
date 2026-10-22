@@ -1,5 +1,5 @@
 use std::{
-    path::{MAIN_SEPARATOR, Path, PathBuf},
+    path::{MAIN_SEPARATOR, Path},
     time::Instant,
 };
 
@@ -10,65 +10,21 @@ use ely_gpui_component::{
     primitives::{Icon, IconName, Tooltip},
     theme::{ActiveTheme, ControlSize, IconSize},
 };
-use gpui::{AnyElement, App, Entity, SharedString, Subscription, div, prelude::*, rems};
+use gpui::{AnyElement, App, Entity, SharedString, div, prelude::*, rems};
 
 use crate::{
-    term::{Kind, Record, Records, State, TerminalView},
-    workspace::{TITLE, Workspace},
+    term::{Kind, Record, Records, State},
+    workspace::Workspace,
 };
 
 pub mod orb;
 
 use orb::Look;
 
-/// A program on its own terminal, as the sessions column lists it.
-pub struct Session {
-    pub terminal: Entity<TerminalView>,
-    /// The program's title; empty while it names none.
-    pub title: String,
-    /// The name the user gave it; empty leaves the title to its program.
-    pub name: String,
-    /// The field its row shows while the user renames it.
-    pub editing: Option<(Entity<TextInput>, Subscription)>,
-    /// The folder it reports, else the one it started in.
-    pub folder: PathBuf,
-    /// Its shell has integration, or it reported a folder anyway.
-    pub reports: bool,
-    /// A bell rang while it was hidden.
-    pub bell: bool,
-    /// It started waiting on the user while hidden.
-    pub waiting: bool,
-    /// The look its mark shows, and since when.
-    pub look: Option<(Look, Instant)>,
-    pub _events: Subscription,
-}
-
-impl Session {
-    /// What it is called: the user's name, else its program's title, else the app's name.
-    pub fn named(&self) -> &str {
-        [self.name.as_str(), self.title.as_str()]
-            .into_iter()
-            .find(|title| !title.is_empty())
-            .unwrap_or(TITLE)
-    }
-
-    /// The look its mark takes from its terminal now.
-    pub fn looks(&self, cx: &App) -> Option<Look> {
-        let view = self.terminal.read(cx);
-        let failed = view.ended().is_some_and(|code| code != 0);
-        look(view.records().shown().map(|(_, record)| record), failed)
-    }
-
-    /// Notes the look its mark takes `now`; true while the mark moves.
-    pub fn note(&mut self, now: Instant, cx: &App) -> bool {
-        let shows = self.looks(cx);
-        if self.look.map(|(shown, _)| shown) != shows {
-            self.look = shows.map(|shows| (shows, now));
-        }
-        self.look
-            .is_some_and(|(look, since)| orb::moves(look, now.saturating_duration_since(since)))
-    }
-}
+mod model;
+mod navigation;
+pub use model::{Session, Tab};
+pub use navigation::{after_close, after_move};
 
 /// The most records hover lists, and the most characters it shows of each part.
 const LISTED: usize = 10;
@@ -95,15 +51,6 @@ pub fn one_line(text: &str) -> String {
         .collect()
 }
 
-/// The session shown once session `closed` of `left + 1` is gone, `active` having been shown.
-pub fn after_close(active: usize, closed: usize, left: usize) -> usize {
-    if closed < active || active == left {
-        active - 1
-    } else {
-        active
-    }
-}
-
 /// Session `index`'s row: its title and folder, the mark of its status, a bell while one rang unseen, a button that closes it.
 pub fn row(
     workspace: &Entity<Workspace>,
@@ -114,14 +61,17 @@ pub fn row(
     now: Instant,
     cx: &App,
 ) -> ListItem {
-    let terminal = session.terminal.read(cx);
-    let pid = terminal.pid() as usize;
+    let pid = session.id;
     let (select, close) = (workspace.clone(), workspace.clone());
     let editing = session.editing.is_some();
     let item = ListItem::new(("session", pid), session.named().to_string())
-        .description(shown(&session.folder, home))
+        .description(format!(
+            "{} · {} tabs",
+            shown(&session.current().folder, home),
+            session.tabs.len()
+        ))
         .selected(active)
-        .strong(session.bell || session.waiting)
+        .strong(session.tabs.iter().any(|tab| tab.bell || tab.waiting))
         // A press in the field it renames with stays the field's.
         .on_click(
             move |event, window, cx| match (editing, event.click_count()) {
@@ -137,7 +87,7 @@ pub fn row(
                 .tooltip("Close session")
                 .on_click(move |_, window, cx| {
                     cx.stop_propagation();
-                    close.update(cx, |this, cx| this.close(index, window, cx))
+                    close.update(cx, |this, cx| this.request_close(index, window, cx))
                 }),
         );
     let item = match &session.editing {
@@ -146,7 +96,9 @@ pub fn row(
     };
     let mark = mark(session, now, cx);
     let bell = session
-        .bell
+        .tabs
+        .iter()
+        .any(|tab| tab.bell)
         .then(|| Icon::new(IconName::Bell).color(cx.theme().colors.warning));
     if mark.is_none() && bell.is_none() {
         return item;
@@ -167,7 +119,7 @@ fn editor(
     session: &Session,
     input: &Entity<TextInput>,
 ) -> impl IntoElement {
-    let (workspace, id) = (workspace.clone(), session.terminal.entity_id());
+    let (workspace, id) = (workspace.clone(), session.id);
     div()
         .on_key_down(move |event, window, cx| {
             if event.keystroke.key == "escape" {
@@ -205,14 +157,21 @@ fn mark(session: &Session, now: Instant, cx: &App) -> Option<AnyElement> {
         Look::Done => colors.success,
         Look::Idle => colors.fg_muted,
     };
-    let pid = session.terminal.read(cx).pid() as usize;
-    // Hover reads the records as they stand, so an open one follows them, and scrolls within the window.
-    let watched = session.terminal.downgrade();
+    let pid = session.id;
+    let watched: Vec<_> = session
+        .tabs
+        .iter()
+        .map(|tab| tab.terminal.downgrade())
+        .collect();
     let tip = Tooltip::rich(move |window, cx| {
-        let lines = watched.upgrade().map_or_else(Vec::new, |terminal| {
-            let view = terminal.read(cx);
-            hover(view.records(), view.ended().filter(|&code| code != 0))
-        });
+        let lines: Vec<_> = watched
+            .iter()
+            .filter_map(|tab| tab.upgrade())
+            .flat_map(|terminal| {
+                let view = terminal.read(cx);
+                hover(view.records(), view.ended().filter(|&code| code != 0))
+            })
+            .collect();
         let room = window.viewport_size().height - rems(3.).to_pixels(window.rem_size());
         div()
             .id("session-hover")
@@ -318,6 +277,7 @@ fn invisible(c: char) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::path::PathBuf;
 
     #[test]
     fn folders_under_home_read_from_a_tilde() {
@@ -348,10 +308,15 @@ mod tests {
 
     #[test]
     fn closing_shows_the_next_session_or_keeps_the_shown_one() {
-        assert_eq!(after_close(2, 0, 3), 1, "one before it went");
-        assert_eq!(after_close(1, 1, 3), 1, "it went: the next one");
-        assert_eq!(after_close(3, 3, 3), 2, "the last went: the one before");
-        assert_eq!(after_close(1, 2, 3), 1, "one after it went");
+        assert_eq!(after_close(2, 0, 3), Some(1), "one before it went");
+        assert_eq!(after_close(1, 1, 3), Some(1), "it went: the next one");
+        assert_eq!(
+            after_close(3, 3, 3),
+            Some(2),
+            "the last went: the one before"
+        );
+        assert_eq!(after_close(1, 2, 3), Some(1), "one after it went");
+        assert_eq!(after_close(0, 0, 0), None, "last tab closes its session");
     }
 
     #[test]

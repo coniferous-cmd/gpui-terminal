@@ -160,6 +160,11 @@ Progress truth. Top to bottom, one at a time. A task is ticked only after its co
 - [x] T63 A double-click on a session's title renames it, which a user asked for after 0.1.6: the row's title turns into a field, Enter keeps the name, Escape drops it; the name shows in the row, the terminal's header and the window's title over the program's own until renamed again, and an empty name gives the title back to the program; it lives as long as the session.
 - [x] T65 Dragging the window on Windows 10 with Background blur on follows the pointer, which a user found lagging seconds behind in issue #3 after 0.1.5: find where the lag comes from in gpui's acrylic path, fix the cause on Windows 10 alone, log what changes, and reply on the issue.
 
+## Session tabs
+
+- [x] T67 Sessions group independent terminal tabs: Ely's tab bar adds, selects, closes and reorders tabs; each session retains its selection; the last tab's close or exit closes its session, and the last session closes the window. Multi-tab session closure asks first; Files, Git and notification activation follow the exact tab, and session status aggregates its tabs.
+- [ ] T68 Interactive acceptance on Windows, macOS and Linux: tab creation, switching, drag reorder, close confirmation, background exit and notification focus; verify terminal layout and input after each change.
+
 ## 33. Release
 
 - [x] T64 Release v0.1.7 with T59 to T63, T65 and T66: version 0.1.7; the macOS disk image, the Windows zip and the Linux tarball, each from its script; the notes list what changed in English and Chinese.

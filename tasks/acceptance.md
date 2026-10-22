@@ -98,10 +98,11 @@ What no check reached: no real KWin drew the blur; of Wayland desktops, only Hyp
 
 | PRD line | Task | Evidence | Status |
 |---|---|---|---|
-| Rows: title, then the folder, home as `~` | T12 | `sessions::tests` | Pass |
-| New (+, Cmd-T), close (×, Cmd-W), select (press, Cmd-1…9, Ctrl-Tab) | T12 | 2026-10-15: + opened session 2, a press showed session 1 again | Pass |
-| A program's end closes its row; the last row closes the window | T12 | T12 review | Pass |
-| A bell in a hidden session marks its row | T12 | T12 review | Pass |
+| Rows: title, selected tab's folder, home as `~`, tab count | T12, T67 | Folder-label tests pass; new grouped UI awaits T68 | Partial |
+| Sessions contain independent tabs; new, select, close and reorder in a tab bar; each session retains its selection | T67, T68 | `sessions::navigation` exhaustively checks selected identity after close and reorder; Windows compilation and tests pass; interactive multi-platform acceptance pending | Partial |
+| Last tab's close or program exit closes its session; last session closes the window | T67, T68 | `sessions::navigation` checks empty-group closure selection; runtime event paths share `close_tab`; interactive acceptance pending | Partial |
+| Closing a multi-tab session asks first | T67, T68 | Ely `ConfirmDialog`, keyed by stable session identity; interactive acceptance pending | Partial |
+| Hidden tabs mark their owning session; status aggregates all tabs | T67, T68 | `sessions::model` checks attention priority; notification activation locates the exact terminal entity; interactive acceptance pending | Partial |
 
 ## 8. Right panel: Files
 

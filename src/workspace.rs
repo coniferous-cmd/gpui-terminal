@@ -10,8 +10,8 @@ use ely_gpui_component::{
 };
 use gpui::{
     Action, App, AppContext, Context, Entity, FocusHandle, Focusable, InteractiveElement,
-    IntoElement, KeyBinding, ParentElement, Render, SharedString, StatefulInteractiveElement,
-    StyleRefinement, Styled, Subscription, Task, Window, actions, div, prelude::FluentBuilder,
+    IntoElement, ParentElement, Render, SharedString, StatefulInteractiveElement, StyleRefinement,
+    Styled, Subscription, Task, Window, actions, div, prelude::FluentBuilder,
 };
 
 use crate::{
@@ -20,18 +20,18 @@ use crate::{
     git::panel::{Acted, GitPanel},
     menus,
     sessions::{self, Session, orb},
-    settings::{PanelTab, Settings, SettingsStore, StartIn, window::OpenSettings},
-    term::{
-        Events, Launch, Pty, TerminalView, config,
-        shell::{ShellIntegration, launch},
-        spawn,
-    },
+    settings::{PanelTab, Settings, SettingsStore, window::OpenSettings},
+    term::{Events, Launch, Pty},
 };
 
+mod closing;
 mod events;
+mod keys;
 mod rename;
+mod tabs;
 mod widths;
 
+pub use keys::bind_keys;
 use widths::{Dragged, Side};
 
 actions!(
@@ -43,48 +43,24 @@ actions!(
         CloseSession,
         NextSession,
         PreviousSession,
-        LastSession
+        NewTab,
+        CloseTab,
+        NextTab,
+        PreviousTab,
+        LastTab
     ]
 );
 
-/// Shows the session at this place, from 0; past the last one, the key goes on to the program.
+/// Shows a tab by position; an out-of-range binding passes to the program.
 #[derive(Clone, Debug, PartialEq, Action)]
 #[action(namespace = elyterminal, no_json)]
-pub struct SelectSession(pub usize);
+pub struct SelectTab(pub usize);
 
 /// The key context of the main window's content.
 pub const CONTEXT: &str = "Workspace";
 
 /// The window's title while the program names none.
 pub const TITLE: &str = "ELYTerminal";
-
-/// Ghostty's keys: Cmd on macOS; off it, Ctrl-Shift for keys a terminal takes, Alt for digits.
-pub fn bind_keys(cx: &mut App) {
-    let (sessions, panel, new, close, digit) = if cfg!(target_os = "macos") {
-        ("cmd-b", "cmd-alt-b", "cmd-t", "cmd-w", "cmd")
-    } else {
-        (
-            "ctrl-shift-b",
-            "ctrl-shift-alt-b",
-            "ctrl-shift-t",
-            "ctrl-shift-w",
-            "alt",
-        )
-    };
-    let context = Some(CONTEXT);
-    cx.bind_keys([
-        KeyBinding::new(sessions, ToggleSessions, context),
-        KeyBinding::new(panel, TogglePanel, context),
-        KeyBinding::new(new, NewSession, context),
-        KeyBinding::new(close, CloseSession, context),
-        KeyBinding::new("ctrl-tab", NextSession, context),
-        KeyBinding::new("ctrl-shift-tab", PreviousSession, context),
-        KeyBinding::new(&format!("{digit}-9"), LastSession, context),
-    ]);
-    cx.bind_keys(
-        (1..=8).map(|n| KeyBinding::new(&format!("{digit}-{n}"), SelectSession(n - 1), context)),
-    );
-}
 
 /// The main window's content: sessions, the terminal, and Git or Files, in Ely's columns.
 pub struct Workspace {
@@ -93,6 +69,7 @@ pub struct Workspace {
     sessions: Vec<Session>,
     /// The session shown.
     active: usize,
+    closing: Option<gpui::EntityId>,
     files: Entity<Files>,
     git: Entity<GitPanel>,
     /// What the window shows of the desktop, and the blur behind it.
@@ -117,7 +94,7 @@ impl Workspace {
         let git = cx.new(|cx| GitPanel::new(launch.cwd.clone(), window, cx));
         // A change the Git panel made shows in Files' marks too.
         let acted = cx.subscribe(&git, |this, _, _: &Acted, cx| {
-            let folder = this.sessions[this.active].folder.clone();
+            let folder = this.sessions[this.active].current().folder.clone();
             this.files.update(cx, |files, cx| files.show(&folder, cx));
         });
         let mut workspace = Self {
@@ -125,6 +102,7 @@ impl Workspace {
             pointer: Default::default(),
             sessions: Vec::new(),
             active: 0,
+            closing: None,
             files: cx.new(|_| Files::new(launch.cwd.clone())),
             git,
             background: Blur::new(window, SettingsStore::get(cx)),
@@ -136,38 +114,10 @@ impl Workspace {
             }),
             _acted: acted,
         };
-        workspace.add(pty, events, launch, window, cx);
+        let tab = workspace.make_tab(pty, events, launch, window, cx);
+        workspace.add_session(tab);
         workspace.select(0, window, cx);
         workspace
-    }
-
-    fn add(
-        &mut self,
-        pty: Pty,
-        events: Events,
-        launch: Launch,
-        window: &mut Window,
-        cx: &mut Context<Self>,
-    ) {
-        let terminal = cx.new(|cx| TerminalView::new(pty, events, window, cx));
-        let id = terminal.entity_id();
-        let events = cx.subscribe_in(&terminal, window, move |this, _, event, window, cx| {
-            this.session_event(id, event, window, cx)
-        });
-        let pid = terminal.read(cx).pid();
-        log::info!("app: session {pid} opens in {}", launch.cwd.display());
-        self.sessions.push(Session {
-            terminal,
-            title: String::new(),
-            name: String::new(),
-            editing: None,
-            folder: launch.cwd,
-            reports: launch.reports,
-            bell: false,
-            waiting: false,
-            look: None,
-            _events: events,
-        });
     }
 
     /// Notes each session's mark `now`, and draws the window at each step while one shown moves.
@@ -195,31 +145,6 @@ impl Workspace {
         });
     }
 
-    /// A session of the shell the settings name, in home or the shown session's folder.
-    fn new_session(&mut self, window: &mut Window, cx: &mut Context<Self>) {
-        let Some(home) = dirs::home_dir() else {
-            log::error!("app: no home folder, so no new session");
-            return;
-        };
-        let settings = SettingsStore::get(cx);
-        let folder = match settings.start_in {
-            StartIn::Home => home,
-            StartIn::Session => self
-                .sessions
-                .get(self.active)
-                .map_or(home, |session| session.folder.clone()),
-        };
-        let started = launch(&settings.shell, folder, &cx.global::<ShellIntegration>().0)
-            .and_then(|launch| Ok((spawn(&launch, (80, 24), (8, 16), config(settings))?, launch)));
-        match started {
-            Ok(((pty, events), launch)) => {
-                self.add(pty, events, launch, window, cx);
-                self.select(self.sessions.len() - 1, window, cx);
-            }
-            Err(error) => log::error!("app: no new session: {error:#}"),
-        }
-    }
-
     /// Shows session `index`, clears its bell and its waiting mark, and gives its terminal the keys.
     pub fn select(&mut self, index: usize, window: &mut Window, cx: &mut Context<Self>) {
         if index >= self.sessions.len() {
@@ -228,17 +153,18 @@ impl Workspace {
         if index != self.active
             && let Some(hidden) = self.sessions.get(self.active)
         {
-            hidden.terminal.update(cx, |view, cx| {
+            hidden.current().terminal.update(cx, |view, cx| {
                 view.let_go(cx);
                 view.set_front(false);
             });
         }
         let session = &mut self.sessions[index];
-        session.bell = false;
-        session.waiting = false;
-        session.terminal.update(cx, |view, _| view.set_front(true));
-        window.focus(&session.terminal.focus_handle(cx), cx);
-        let folder = session.folder.clone();
+        let tab = &mut session.tabs[session.active];
+        tab.bell = false;
+        tab.waiting = false;
+        tab.terminal.update(cx, |view, _| view.set_front(true));
+        window.focus(&tab.terminal.focus_handle(cx), cx);
+        let folder = tab.folder.clone();
         self.files.update(cx, |files, cx| files.show(&folder, cx));
         self.git.update(cx, |git, cx| git.show(&folder, cx));
         self.active = index;
@@ -253,14 +179,21 @@ impl Workspace {
             return;
         }
         let session = self.sessions.remove(index);
-        log::info!("app: session {} closes", session.terminal.read(cx).pid());
-        if self.sessions.is_empty() {
+        if self.closing == Some(session.id) {
+            self.closing = None;
+        }
+        log::info!(
+            "app: session {:?} closes with {} tabs",
+            session.id,
+            session.tabs.len()
+        );
+        let Some(next) = sessions::after_close(self.active, index, self.sessions.len()) else {
             log::info!("app: no session left; the window closes");
             window.remove_window();
             return;
-        }
+        };
         let shown = index == self.active;
-        self.active = sessions::after_close(self.active, index, self.sessions.len());
+        self.active = next;
         if shown {
             self.select(self.active, window, cx);
         } else {
@@ -381,10 +314,18 @@ impl Render for Workspace {
         let shown = self
             .sessions
             .get(self.active)
-            .map(|session| session.terminal.clone());
+            .map(|session| session.current().terminal.clone());
+        let tab_bar = self.tab_bar(cx);
         let mut terminal = ShellColumn::new("terminal")
             .title(self.title().to_string())
-            .children(shown);
+            .child(tab_bar)
+            .child(
+                div()
+                    .flex_1()
+                    .min_h_0()
+                    .relative()
+                    .child(div().absolute().size_full().children(shown)),
+            );
         if settings.show_sessions {
             let home = dirs::home_dir();
             let rows = self.sessions.iter().enumerate().map(|(index, session)| {
@@ -397,7 +338,7 @@ impl Render for Workspace {
                 .size(ControlSize::Sm)
                 .tooltip("New session")
                 .on_click(move |_, window, cx| {
-                    workspace.update(cx, |this, cx| this.new_session(window, cx))
+                    workspace.update(cx, |this, cx| this.new_terminal(true, window, cx))
                 });
             shell = shell.column(
                 self.side_column(Side::Sessions, cx)
@@ -429,7 +370,7 @@ impl Render for Workspace {
             let quiet = self
                 .sessions
                 .get(self.active)
-                .is_some_and(|session| !session.reports);
+                .is_some_and(|session| !session.current().reports);
             let caption = || Caption::new("This shell reports no folder.").px_3().pt_2();
             // Hidden, not dropped, so each keeps its state.
             let body = |on: bool| {
@@ -468,30 +409,43 @@ impl Render for Workspace {
             .on_action(cx.listener(|this, _: &TogglePanel, _, cx| {
                 this.toggle(|settings| settings.show_panel = !settings.show_panel, cx)
             }))
-            .on_action(cx.listener(|this, _: &NewSession, window, cx| this.new_session(window, cx)))
             .on_action(
-                cx.listener(|this, _: &CloseSession, window, cx| {
-                    this.close(this.active, window, cx)
-                }),
+                cx.listener(|this, _: &NewTab, window, cx| this.new_terminal(false, window, cx)),
             )
-            .on_action(cx.listener(|this, _: &NextSession, window, cx| this.step(true, window, cx)))
-            .on_action(
-                cx.listener(|this, _: &PreviousSession, window, cx| this.step(false, window, cx)),
-            )
-            .on_action(cx.listener(|this, _: &LastSession, window, cx| {
-                this.select(this.sessions.len().saturating_sub(1), window, cx)
+            .on_action(cx.listener(|this, _: &CloseTab, window, cx| {
+                let tab = this.sessions[this.active].active;
+                this.close_tab(this.active, tab, window, cx);
             }))
-            .on_action(cx.listener(|this, select: &SelectSession, window, cx| {
-                if select.0 < this.sessions.len() {
-                    this.select(select.0, window, cx);
+            .on_action(cx.listener(|this, _: &NextTab, window, cx| this.step_tab(true, window, cx)))
+            .on_action(
+                cx.listener(|this, _: &PreviousTab, window, cx| this.step_tab(false, window, cx)),
+            )
+            .on_action(cx.listener(|this, _: &LastTab, window, cx| {
+                let last = this.sessions[this.active].tabs.len() - 1;
+                this.select_tab(last, window, cx);
+            }))
+            .on_action(cx.listener(|this, select: &SelectTab, window, cx| {
+                if select.0 < this.sessions[this.active].tabs.len() {
+                    this.select_tab(select.0, window, cx);
                 } else {
                     cx.propagate();
                 }
             }))
+            .on_action(
+                cx.listener(|this, _: &NewSession, window, cx| this.new_terminal(true, window, cx)),
+            )
+            .on_action(cx.listener(|this, _: &CloseSession, window, cx| {
+                this.request_close(this.active, window, cx)
+            }))
+            .on_action(cx.listener(|this, _: &NextSession, window, cx| this.step(true, window, cx)))
+            .on_action(
+                cx.listener(|this, _: &PreviousSession, window, cx| this.step(false, window, cx)),
+            )
             .child(
                 ResizeBorder::new()
                     .when(self.background.see_through(), ResizeBorder::glass)
                     .child(FocusScope::new(&self.focus).root().size_full().child(shell)),
             )
+            .children(self.close_dialog(cx))
     }
 }

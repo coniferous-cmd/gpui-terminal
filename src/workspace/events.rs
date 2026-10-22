@@ -4,7 +4,7 @@ use super::Workspace;
 use crate::term::{State, TerminalEvent};
 
 impl Workspace {
-    /// What session `id`'s terminal reported.
+    /// Routes a terminal report to its owning tab, including hidden ones.
     pub(super) fn session_event(
         &mut self,
         id: EntityId,
@@ -12,70 +12,68 @@ impl Workspace {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        let Some(index) = self
-            .sessions
-            .iter()
-            .position(|session| session.terminal.entity_id() == id)
-        else {
+        let Some((index, tab_index)) = self.locate_tab(id) else {
             return;
         };
-        let session = &mut self.sessions[index];
+        let shown = index == self.active && tab_index == self.sessions[index].active;
+        let tab = &mut self.sessions[index].tabs[tab_index];
         match event {
             TerminalEvent::Title(title) => {
-                log::debug!("app: session {}'s program names it {title:?}", index + 1);
-                session.title.clone_from(title);
+                log::debug!("app: tab {id:?}'s program names it {title:?}");
+                tab.title.clone_from(title);
             }
             TerminalEvent::Folder(folder) => {
-                session.folder.clone_from(folder);
-                session.reports = true;
-                if index == self.active {
+                tab.folder.clone_from(folder);
+                tab.reports = true;
+                if shown {
                     self.files.update(cx, |files, cx| files.show(folder, cx));
                     self.git.update(cx, |git, cx| git.show(folder, cx));
                 }
             }
-            TerminalEvent::Bell if index != self.active => {
-                if !session.bell {
-                    log::debug!("app: a bell in hidden session {}", index + 1);
-                }
-                session.bell = true;
+            TerminalEvent::Bell if !shown => {
+                log::debug!("app: a bell in hidden tab {id:?}");
+                tab.bell = true;
             }
             TerminalEvent::Bell => {}
-            // A hidden session that starts waiting marks its row until it is shown.
-            TerminalEvent::Shows(Some(State::Blocked)) if index != self.active => {
-                log::debug!("app: hidden session {} waits", index + 1);
-                session.waiting = true;
+            TerminalEvent::Shows(Some(State::Blocked)) if !shown => {
+                log::debug!("app: hidden tab {id:?} waits");
+                tab.waiting = true;
             }
             TerminalEvent::Shows(_) => {}
             TerminalEvent::Exited(status) => {
-                let pid = session.terminal.read(cx).pid();
-                log::info!("app: session {pid}'s program ended, {status}");
-                self.close(index, window, cx);
+                log::info!(
+                    "app: tab {}'s program ended, {status}",
+                    tab.terminal.read(cx).pid()
+                );
+                self.close_tab(index, tab_index, window, cx);
                 return;
             }
         }
-        if index == self.active {
+        if shown {
             self.retitle(window);
         }
         cx.notify();
     }
 
-    /// A press on notification `tag`: its session hears of it and shows, unless it asked not to; false when no session here posted it.
+    /// A notification press finds its exact tab, not just its session.
     pub fn pressed(&mut self, tag: &str, window: &mut Window, cx: &mut Context<Self>) -> bool {
         let found = self
             .sessions
             .iter()
             .enumerate()
             .find_map(|(index, session)| {
-                let focus = session.terminal.update(cx, |view, _| view.pressed(tag))?;
-                Some((index, focus))
+                session.tabs.iter().enumerate().find_map(|(tab, entry)| {
+                    let focus = entry.terminal.update(cx, |view, _| view.pressed(tag))?;
+                    Some((index, tab, focus))
+                })
             });
-        let Some((index, focus)) = found else {
+        let Some((index, tab, focus)) = found else {
             return false;
         };
         if focus {
             cx.activate(true);
             window.activate_window();
-            self.select(index, window, cx);
+            self.show_terminal(index, tab, window, cx);
         }
         true
     }
