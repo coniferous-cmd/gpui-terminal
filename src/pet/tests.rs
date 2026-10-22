@@ -7,7 +7,7 @@ use super::{look::Mark, *};
 /// Her, `mood` since `since`, come long before.
 fn ely(mood: Mood, since: Instant) -> Pet {
     Pet {
-        rig: Rc::new(Rig::new()),
+        rig: Rc::new(Rig::load().expect("ely's assets load")),
         pointer: Default::default(),
         gaze: Default::default(),
         mood,

@@ -1,5 +1,6 @@
 //! Ely, the icon's girl, peeking over the main window's top edge from a window of her own, or up from its bottom edge where no room lies above.
 
+mod assets;
 pub(crate) mod gaze;
 mod look;
 #[cfg(target_os = "macos")]
@@ -244,6 +245,8 @@ fn show(main: WindowHandle<Workspace>, cx: &mut App) -> anyhow::Result<WindowHan
         )
     };
     let start = feeling(workspace.read(cx), cx);
+    // Her assets are checked before her window opens, so a bad bundle leaves no empty window.
+    let rig = Rc::new(Rig::load()?);
     let pet = cx.open_window(options, |_, cx| {
         cx.new(|cx| {
             let feel = cx.observe(&workspace, move |pet: &mut Pet, workspace, cx| {
@@ -254,7 +257,7 @@ fn show(main: WindowHandle<Workspace>, cx: &mut App) -> anyhow::Result<WindowHan
                 }
             });
             Pet {
-                rig: Rc::new(Rig::new()),
+                rig: rig.clone(),
                 pointer: workspace.read(cx).pointer.clone(),
                 gaze: Default::default(),
                 mood: start,

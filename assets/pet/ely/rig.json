@@ -1,0 +1,999 @@
+{
+  "view": [
+    110.0,
+    6.0,
+    292.0,
+    280.0
+  ],
+  "head_pivot": [
+    256.0,
+    236.0
+  ],
+  "layers": [
+    {
+      "name": "hair-back",
+      "asset": "layers/hair-back.svg",
+      "color": "EC86B5",
+      "alpha": 1.0,
+      "frame": [
+        117.0,
+        45.0,
+        278.0,
+        296.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "shade-back",
+      "asset": "layers/shade-back.svg",
+      "color": "D9659A",
+      "alpha": 1.0,
+      "frame": [
+        193.0,
+        199.0,
+        126.0,
+        78.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "neck",
+      "asset": "layers/neck.svg",
+      "color": "F7CDBE",
+      "alpha": 1.0,
+      "frame": [
+        235.0,
+        221.0,
+        42.0,
+        50.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "body"
+      }
+    },
+    {
+      "name": "collar",
+      "asset": "layers/collar.svg",
+      "color": "FFFFFF",
+      "alpha": 1.0,
+      "frame": [
+        193.0,
+        255.0,
+        126.0,
+        86.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "body"
+      }
+    },
+    {
+      "name": "bow",
+      "asset": "layers/bow.svg",
+      "color": "F05A97",
+      "alpha": 1.0,
+      "frame": [
+        221.0,
+        247.0,
+        70.0,
+        32.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "body"
+      }
+    },
+    {
+      "name": "knot",
+      "asset": "layers/knot.svg",
+      "color": "D94683",
+      "alpha": 1.0,
+      "frame": [
+        247.0,
+        255.0,
+        18.0,
+        18.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "body"
+      }
+    },
+    {
+      "name": "skin",
+      "asset": "layers/skin.svg",
+      "color": "FFE7DC",
+      "alpha": 1.0,
+      "frame": [
+        177.0,
+        93.0,
+        158.0,
+        152.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "face-shade",
+      "asset": "layers/face-shade.svg",
+      "color": "F9D8CB",
+      "alpha": 1.0,
+      "frame": [
+        161.0,
+        73.0,
+        190.0,
+        118.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "iris-l",
+      "asset": "layers/iris-l.svg",
+      "color": "A24FB9",
+      "alpha": 1.0,
+      "frame": [
+        203.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 0
+      }
+    },
+    {
+      "name": "ring-l",
+      "asset": "layers/ring-l.svg",
+      "color": "EE84C4",
+      "alpha": 1.0,
+      "frame": [
+        203.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 0
+      }
+    },
+    {
+      "name": "pupil-l",
+      "asset": "layers/pupil-l.svg",
+      "color": "5A2368",
+      "alpha": 1.0,
+      "frame": [
+        203.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 0
+      }
+    },
+    {
+      "name": "shine-l",
+      "asset": "layers/shine-l.svg",
+      "color": "FFFFFF",
+      "alpha": 1.0,
+      "frame": [
+        203.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 0
+      }
+    },
+    {
+      "name": "lid-l",
+      "asset": "layers/lid-l.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        193.0,
+        158.0,
+        52.0,
+        26.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "lid",
+        "side": 0
+      }
+    },
+    {
+      "name": "lash-l",
+      "asset": "layers/lash-l.svg",
+      "color": "C2506F",
+      "alpha": 0.3499999940395355,
+      "frame": [
+        213.0,
+        210.0,
+        18.0,
+        6.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "lid",
+        "side": 0
+      }
+    },
+    {
+      "name": "iris-r",
+      "asset": "layers/iris-r.svg",
+      "color": "A24FB9",
+      "alpha": 1.0,
+      "frame": [
+        271.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 1
+      }
+    },
+    {
+      "name": "ring-r",
+      "asset": "layers/ring-r.svg",
+      "color": "EE84C4",
+      "alpha": 1.0,
+      "frame": [
+        271.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 1
+      }
+    },
+    {
+      "name": "pupil-r",
+      "asset": "layers/pupil-r.svg",
+      "color": "5A2368",
+      "alpha": 1.0,
+      "frame": [
+        271.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 1
+      }
+    },
+    {
+      "name": "shine-r",
+      "asset": "layers/shine-r.svg",
+      "color": "FFFFFF",
+      "alpha": 1.0,
+      "frame": [
+        271.0,
+        164.0,
+        38.0,
+        48.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "iris",
+        "side": 1
+      }
+    },
+    {
+      "name": "lid-r",
+      "asset": "layers/lid-r.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        267.0,
+        158.0,
+        52.0,
+        26.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "lid",
+        "side": 1
+      }
+    },
+    {
+      "name": "lash-r",
+      "asset": "layers/lash-r.svg",
+      "color": "C2506F",
+      "alpha": 0.3499999940395355,
+      "frame": [
+        281.0,
+        210.0,
+        18.0,
+        6.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "lid",
+        "side": 1
+      }
+    },
+    {
+      "name": "arc-l",
+      "asset": "layers/arc-l.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        200.0,
+        171.0,
+        44.0,
+        31.0
+      ],
+      "pivot": [
+        222.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "arc",
+        "side": 0
+      }
+    },
+    {
+      "name": "arc-r",
+      "asset": "layers/arc-r.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        268.0,
+        171.0,
+        44.0,
+        31.0
+      ],
+      "pivot": [
+        290.0,
+        192.0
+      ],
+      "binding": {
+        "bone": "arc",
+        "side": 1
+      }
+    },
+    {
+      "name": "lines",
+      "asset": "layers/lines.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        201.0,
+        190.0,
+        110.0,
+        8.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "lines"
+      }
+    },
+    {
+      "name": "blush",
+      "asset": "layers/blush.svg",
+      "color": "FF8DAA",
+      "alpha": 0.550000011920929,
+      "frame": [
+        180.0,
+        206.0,
+        152.0,
+        20.0
+      ],
+      "pivot": [
+        256.0,
+        216.0
+      ],
+      "binding": {
+        "bone": "blush"
+      }
+    },
+    {
+      "name": "smile",
+      "asset": "layers/smile.svg",
+      "color": "C2506F",
+      "alpha": 1.0,
+      "frame": [
+        241.0,
+        219.0,
+        30.0,
+        13.0
+      ],
+      "pivot": [
+        256.0,
+        224.0
+      ],
+      "binding": {
+        "bone": "mouth",
+        "mouth": "smile"
+      }
+    },
+    {
+      "name": "grin",
+      "asset": "layers/grin.svg",
+      "color": "C2506F",
+      "alpha": 1.0,
+      "frame": [
+        242.0,
+        218.0,
+        28.0,
+        24.0
+      ],
+      "pivot": [
+        256.0,
+        224.0
+      ],
+      "binding": {
+        "bone": "mouth",
+        "mouth": "grin"
+      }
+    },
+    {
+      "name": "tongue",
+      "asset": "layers/tongue.svg",
+      "color": "FF8DAA",
+      "alpha": 1.0,
+      "frame": [
+        248.0,
+        224.0,
+        16.0,
+        13.0
+      ],
+      "pivot": [
+        256.0,
+        224.0
+      ],
+      "binding": {
+        "bone": "mouth",
+        "mouth": "grin"
+      }
+    },
+    {
+      "name": "gasp",
+      "asset": "layers/gasp.svg",
+      "color": "C2506F",
+      "alpha": 1.0,
+      "frame": [
+        249.0,
+        218.0,
+        14.0,
+        16.0
+      ],
+      "pivot": [
+        256.0,
+        224.0
+      ],
+      "binding": {
+        "bone": "mouth",
+        "mouth": "gasp"
+      }
+    },
+    {
+      "name": "flat",
+      "asset": "layers/flat.svg",
+      "color": "C2506F",
+      "alpha": 1.0,
+      "frame": [
+        246.0,
+        222.0,
+        20.0,
+        6.0
+      ],
+      "pivot": [
+        256.0,
+        224.0
+      ],
+      "binding": {
+        "bone": "mouth",
+        "mouth": "flat"
+      }
+    },
+    {
+      "name": "frown",
+      "asset": "layers/frown.svg",
+      "color": "C2506F",
+      "alpha": 1.0,
+      "frame": [
+        243.0,
+        217.0,
+        26.0,
+        14.0
+      ],
+      "pivot": [
+        256.0,
+        224.0
+      ],
+      "binding": {
+        "bone": "mouth",
+        "mouth": "frown"
+      }
+    },
+    {
+      "name": "lock-l",
+      "asset": "layers/lock-l.svg",
+      "color": "F7A6C9",
+      "alpha": 1.0,
+      "frame": [
+        147.0,
+        117.0,
+        54.0,
+        200.0
+      ],
+      "pivot": [
+        184.0,
+        118.0
+      ],
+      "binding": {
+        "bone": "lock",
+        "side": 0
+      }
+    },
+    {
+      "name": "lock-r",
+      "asset": "layers/lock-r.svg",
+      "color": "F7A6C9",
+      "alpha": 1.0,
+      "frame": [
+        311.0,
+        117.0,
+        54.0,
+        200.0
+      ],
+      "pivot": [
+        328.0,
+        118.0
+      ],
+      "binding": {
+        "bone": "lock",
+        "side": 1
+      }
+    },
+    {
+      "name": "bangs",
+      "asset": "layers/bangs.svg",
+      "color": "F7A6C9",
+      "alpha": 1.0,
+      "frame": [
+        161.0,
+        61.0,
+        190.0,
+        118.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "gloss",
+      "asset": "layers/gloss.svg",
+      "color": "FFD1E4",
+      "alpha": 1.0,
+      "frame": [
+        195.0,
+        83.0,
+        122.0,
+        26.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "ahoge",
+      "asset": "layers/ahoge.svg",
+      "color": "F7A6C9",
+      "alpha": 1.0,
+      "frame": [
+        237.0,
+        17.0,
+        44.0,
+        50.0
+      ],
+      "pivot": [
+        258.0,
+        64.0
+      ],
+      "binding": {
+        "bone": "ahoge"
+      }
+    },
+    {
+      "name": "pin",
+      "asset": "layers/pin.svg",
+      "color": "FFE48A",
+      "alpha": 1.0,
+      "frame": [
+        303.0,
+        85.0,
+        30.0,
+        30.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "head"
+      }
+    },
+    {
+      "name": "brows",
+      "asset": "layers/brows.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        202.0,
+        148.0,
+        108.0,
+        16.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "brows"
+      }
+    },
+    {
+      "name": "hand-l",
+      "asset": "layers/hand-l.svg",
+      "color": "FFE7DC",
+      "alpha": 1.0,
+      "frame": [
+        149.0,
+        261.0,
+        46.0,
+        26.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "hand",
+        "side": 0
+      }
+    },
+    {
+      "name": "knuckles-l",
+      "asset": "layers/knuckles-l.svg",
+      "color": "F2BBA8",
+      "alpha": 1.0,
+      "frame": [
+        159.0,
+        271.0,
+        26.0,
+        17.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "hand",
+        "side": 0
+      }
+    },
+    {
+      "name": "hand-r",
+      "asset": "layers/hand-r.svg",
+      "color": "FFE7DC",
+      "alpha": 1.0,
+      "frame": [
+        317.0,
+        261.0,
+        46.0,
+        26.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "hand",
+        "side": 1
+      }
+    },
+    {
+      "name": "knuckles-r",
+      "asset": "layers/knuckles-r.svg",
+      "color": "F2BBA8",
+      "alpha": 1.0,
+      "frame": [
+        327.0,
+        271.0,
+        26.0,
+        17.0
+      ],
+      "pivot": [
+        256.0,
+        236.0
+      ],
+      "binding": {
+        "bone": "hand",
+        "side": 1
+      }
+    },
+    {
+      "name": "bang",
+      "asset": "layers/bang.svg",
+      "color": "FFB020",
+      "alpha": 1.0,
+      "frame": [
+        368.0,
+        35.0,
+        20.0,
+        75.0
+      ],
+      "pivot": [
+        378.0,
+        107.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "bang"
+      }
+    },
+    {
+      "name": "bang-edge",
+      "asset": "layers/bang-edge.svg",
+      "color": "45233F",
+      "alpha": 1.0,
+      "frame": [
+        368.0,
+        35.0,
+        20.0,
+        75.0
+      ],
+      "pivot": [
+        378.0,
+        107.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "bang"
+      }
+    },
+    {
+      "name": "z1",
+      "asset": "layers/z1.svg",
+      "color": "9FA3D9",
+      "alpha": 1.0,
+      "frame": [
+        348.0,
+        66.0,
+        28.0,
+        30.0
+      ],
+      "pivot": [
+        362.0,
+        81.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "z1"
+      }
+    },
+    {
+      "name": "z2",
+      "asset": "layers/z2.svg",
+      "color": "9FA3D9",
+      "alpha": 1.0,
+      "frame": [
+        376.0,
+        34.0,
+        22.0,
+        24.0
+      ],
+      "pivot": [
+        387.0,
+        46.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "z2"
+      }
+    },
+    {
+      "name": "heart",
+      "asset": "layers/heart.svg",
+      "color": "FF5C93",
+      "alpha": 1.0,
+      "frame": [
+        349.0,
+        55.0,
+        58.0,
+        46.0
+      ],
+      "pivot": [
+        378.0,
+        82.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "heart"
+      }
+    },
+    {
+      "name": "sparkle-l",
+      "asset": "layers/sparkle-l.svg",
+      "color": "FFE48A",
+      "alpha": 1.0,
+      "frame": [
+        123.0,
+        69.0,
+        34.0,
+        34.0
+      ],
+      "pivot": [
+        140.0,
+        86.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "sparkle-left"
+      }
+    },
+    {
+      "name": "sparkle-r",
+      "asset": "layers/sparkle-r.svg",
+      "color": "FFE48A",
+      "alpha": 1.0,
+      "frame": [
+        367.0,
+        51.0,
+        26.0,
+        26.0
+      ],
+      "pivot": [
+        380.0,
+        64.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "sparkle-right"
+      }
+    },
+    {
+      "name": "drop",
+      "asset": "layers/drop.svg",
+      "color": "9CD5FF",
+      "alpha": 1.0,
+      "frame": [
+        336.0,
+        126.0,
+        22.0,
+        32.0
+      ],
+      "pivot": [
+        346.0,
+        142.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "drop"
+      }
+    },
+    {
+      "name": "drop-edge",
+      "asset": "layers/drop-edge.svg",
+      "color": "5AA0D8",
+      "alpha": 1.0,
+      "frame": [
+        336.0,
+        126.0,
+        22.0,
+        32.0
+      ],
+      "pivot": [
+        346.0,
+        142.0
+      ],
+      "binding": {
+        "bone": "mark",
+        "mark": "drop"
+      }
+    }
+  ]
+}
