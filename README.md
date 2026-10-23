@@ -7,7 +7,7 @@ A terminal for macOS, Windows and Linux, in Rust on GPUI and Ely components. Ses
 A [release on GitHub](https://github.com/ELY-Open-Source/ELYTerminal/releases) carries three builds.
 
 - macOS 11 or later, Apple silicon: open `ELYTerminal-VERSION.dmg` and drag ELYTerminal into Applications. The app is signed with Developer ID and notarized.
-- Windows 10 or later, x86_64: unzip `ELYTerminal-VERSION-windows-x86_64.zip` and run `elyterminal.exe`. It is unsigned; if SmartScreen stops it, press More info, then Run anyway.
+- Windows 10 or later, x86_64: unzip `ELYTerminal-VERSION-windows-x86_64.zip` and run `elyterminal.exe`. Keep `conpty.dll` and `OpenConsole.exe` beside it: the bundled Microsoft ConPTY fixes mouse forwarding on Windows 10. The app is unsigned; if SmartScreen stops it, press More info, then Run anyway.
 - Linux, x86_64, glibc 2.35 or later, with libxkbcommon, libxkbcommon-x11 and libxcb:
 
 ```sh
@@ -28,7 +28,16 @@ Rust 1.95.0, which `rust-toolchain.toml` pins; rustup installs it on the first b
 cargo run --release
 ```
 
-Each platform's script builds its release in `target/release`: on macOS, `scripts/mac-app.sh` builds `ELYTerminal.app`, with its icon, and a disk image of it; on Windows, `scripts/windows-zip.ps1` zips `elyterminal.exe`, its icon inside; on Linux, `scripts/linux-tar.sh` builds in Docker and packs the binary with its desktop entry and icon.
+On Windows, prepare Microsoft's pinned ConPTY runtime before the first debug run:
+
+```powershell
+.\scripts\windows-conpty.ps1
+cargo run
+```
+
+For `cargo run --release`, pass `-Directory target/release` to the preparation script. The script downloads the official NuGet package and checks its SHA256; Windows release packaging runs it automatically. Without these files, Windows 10's system ConPTY does not forward mouse-mode requests, so programs such as herdr receive no mouse events.
+
+Each platform's script builds its release in `target/release`: on macOS, `scripts/mac-app.sh` builds `ELYTerminal.app`, with its icon, and a disk image of it; on Windows, `scripts/windows-zip.ps1` zips `elyterminal.exe`, its icon inside, with Microsoft's ConPTY runtime and license; on Linux, `scripts/linux-tar.sh` builds in Docker and packs the binary with its desktop entry and icon.
 
 On Linux, install the libraries gpui links first. On Debian and Ubuntu:
 
