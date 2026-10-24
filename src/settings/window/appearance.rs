@@ -76,7 +76,7 @@ impl SettingsWindow {
             });
         let fallbacks = SettingsRow::new("Fallbacks")
             .description("Tried in order for characters the family lacks")
-            .control(self.fallback_list(cx));
+            .control(div().w(theme.prose_width()).child(self.fallback_list(cx)));
         let font = SettingsSection::new("Terminal font")
             .row(SettingsRow::new("Family").control(div().w(theme.prose_width()).child(family)))
             .row(fallbacks)
@@ -193,7 +193,6 @@ impl SettingsWindow {
     fn fallback_list(&self, cx: &Context<Self>) -> Div {
         let this = cx.entity();
         let families = SettingsStore::get(cx).font_fallbacks.clone();
-        let width = cx.theme().prose_width();
         let row = |index: usize, picker: FontPicker, remove: IconButton| {
             let tip = if index < families.len() {
                 "Remove"
@@ -204,7 +203,7 @@ impl SettingsWindow {
                 .flex()
                 .items_start()
                 .gap_2()
-                .child(div().w(width).child(picker))
+                .child(div().flex_1().min_w_0().child(picker))
                 .child(
                     remove
                         .variant(ButtonVariant::Ghost)
