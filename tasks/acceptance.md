@@ -30,7 +30,7 @@ What no check reached: no real KWin drew the blur; of Wayland desktops, only Hyp
 
 | PRD line | Task | Evidence | Status |
 |---|---|---|---|
-| One `settings.json` in `dirs::config_dir()/luna-terminal` | T02 | `settings::store` tests | Pass |
+| One `settings.json` at `~/.config/luna/settings.json`, from the home folder | T02 | `the_path_sits_under_the_home_folders_dot_config` | Pass |
 | Every field has a default; a missing file or field means its default | T02 | `settings::tests`, `settings::store` tests | Pass |
 | A bad file or value stops the start, naming file and field; never overwritten | T02 | `a_bad_file_is_an_error_naming_it`, `a_bad_value_is_an_error_naming_the_field` | Pass |
 | Temp file in the same folder, then rename; one writer | T02 | T02 rounds 1–2 | Pass |

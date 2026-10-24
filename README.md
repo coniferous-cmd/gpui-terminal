@@ -89,11 +89,7 @@ Settings › Terminal lists them all, as this platform binds them.
 
 ## Settings
 
-The settings window saves each change at once to `settings.json` in the platform's config folder:
-
-- macOS: `~/Library/Application Support/luna-terminal/settings.json`
-- Linux: `$XDG_CONFIG_HOME/luna-terminal/settings.json`, else `~/.config/luna-terminal/settings.json`
-- Windows: `%APPDATA%\luna-terminal\settings.json`
+The settings window saves each change at once to `~/.config/luna/settings.json`, under the home folder on macOS, Windows and Linux alike. The path does not follow `XDG_CONFIG_HOME`.
 
 A file that does not parse, or holds a value out of range, stops the start with an error naming the file and the field. The app never overwrites it.
 
