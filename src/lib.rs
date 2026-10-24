@@ -1,4 +1,5 @@
 pub mod app;
+pub mod atomic;
 pub mod blur;
 pub mod files;
 pub mod git;
