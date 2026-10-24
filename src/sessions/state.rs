@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 const SESSIONS: usize = 256;
 const TABS: usize = 2048;
 
-/// The file's name, beside `settings.json`.
+/// The file's name, in the platform's config folder; the settings file lives under the home folder.
 pub const FILE: &str = "sessions.json";
 
 /// The workspace as it stood: the session shown, and the sessions themselves.

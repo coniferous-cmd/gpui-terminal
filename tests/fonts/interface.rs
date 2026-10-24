@@ -12,9 +12,7 @@ pub fn run() {
     fs::create_dir_all(&root).expect("isolated home");
     // This test process has no threads or platform yet.
     unsafe { std::env::set_var("HOME", &root) };
-    let path = dirs::config_dir()
-        .expect("config")
-        .join("luna-terminal/settings.json");
+    let path = root.join(".config/luna/settings.json");
     assert!(path.starts_with(&root), "never touch real settings");
     fs::create_dir_all(path.parent().unwrap()).expect("config folder");
     fs::write(

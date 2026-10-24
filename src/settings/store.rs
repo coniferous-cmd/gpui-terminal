@@ -18,10 +18,10 @@ pub struct SettingsStore {
 impl Global for SettingsStore {}
 
 impl SettingsStore {
-    /// Loads `settings.json` from the platform config folder into the app.
+    /// Loads `settings.json` from the home folder's `.config` folder into the app.
     pub fn init(cx: &mut App) -> anyhow::Result<()> {
-        let folder = dirs::config_dir().context("settings: the platform names no config folder")?;
-        let path = folder.join("luna-terminal").join("settings.json");
+        let home = dirs::home_dir().context("settings: the platform names no home folder")?;
+        let path = settings_path(&home);
         let settings = load(&path)?;
         fonts(&settings, cx)
             .and_then(|()| interface_font(&settings, cx))
@@ -55,6 +55,11 @@ impl SettingsStore {
         cx.global_mut::<Self>().settings = next;
         Ok(())
     }
+}
+
+/// The settings file: `.config/luna/settings.json` under the home folder, on every platform.
+fn settings_path(home: &Path) -> PathBuf {
+    home.join(".config").join("luna").join("settings.json")
 }
 
 fn interface_font(settings: &Settings, cx: &App) -> anyhow::Result<()> {
@@ -137,6 +142,12 @@ mod tests {
             fs::remove_dir_all(&folder).expect("a stale test folder goes");
         }
         folder
+    }
+
+    #[test]
+    fn the_path_sits_under_the_home_folders_dot_config() {
+        let path = settings_path(Path::new("/home/alice"));
+        assert_eq!(path, Path::new("/home/alice/.config/luna/settings.json"));
     }
 
     #[test]
