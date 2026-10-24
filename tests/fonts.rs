@@ -1,7 +1,12 @@
 //! gpui builds its Mac platform only on the main thread, so this test brings its own main.
 
 #[cfg(target_os = "macos")]
+#[path = "fonts/interface.rs"]
+mod interface;
+
+#[cfg(target_os = "macos")]
 fn main() {
+    interface::run();
     use elyterminal::term::load_font;
     let system = gpui::TextSystem::new(gpui_platform::current_platform(true).text_system());
     assert!(load_font(&gpui::font("Menlo"), &system).is_ok());

@@ -45,6 +45,7 @@ pub fn start(cx: &mut App) -> anyhow::Result<()> {
         );
     }
     SettingsStore::init(cx)?;
+    settings::interface_font::init(cx);
     updates::start(cx);
     ShellIntegration::init(cx)?;
     input::bind_keys(cx);

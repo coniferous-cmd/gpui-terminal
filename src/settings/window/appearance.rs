@@ -77,7 +77,7 @@ impl SettingsWindow {
         let fallbacks = SettingsRow::new("Fallbacks")
             .description("Tried in order for characters the family lacks")
             .control(self.fallback_list(cx));
-        let font = SettingsSection::new("Font")
+        let font = SettingsSection::new("Terminal font")
             .row(SettingsRow::new("Family").control(div().w(theme.prose_width()).child(family)))
             .row(fallbacks)
             .row(SettingsRow::new("Size").control(self.number(
@@ -174,6 +174,7 @@ impl SettingsWindow {
             .flex_col()
             .gap_6()
             .child(themes)
+            .child(self.interface_font(cx))
             .child(font)
             .child(cursor)
             .child(background)

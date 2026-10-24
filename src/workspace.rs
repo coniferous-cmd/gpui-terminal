@@ -5,7 +5,7 @@ use ely_gpui_component::{
     lists::List,
     primitives::{FocusScope, IconName},
     shell::{ColumnShell, ResizeBorder, ShellColumn},
-    theme::ControlSize,
+    theme::{ActiveTheme, ControlSize},
     typography::Caption,
 };
 use gpui::{
@@ -397,6 +397,7 @@ impl Render for Workspace {
         // The context sits above the focus root, so its keys work wherever focus is.
         div()
             .size_full()
+            .font_family(cx.theme().font_family.clone())
             .child(self.pointer.listener(crate::pet::gaze::Source::Main))
             .key_context(CONTEXT)
             .map(menus::window_actions)

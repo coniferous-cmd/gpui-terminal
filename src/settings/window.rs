@@ -20,6 +20,7 @@ use super::{Settings, SettingsStore};
 use crate::{app::APP_ID, menus, term::BLINK, updates::Updates};
 
 mod appearance;
+mod interface_font;
 mod terminal;
 
 actions!(elyterminal, [OpenSettings, CloseSettings]);
@@ -96,6 +97,7 @@ pub struct SettingsWindow {
     /// Refusals so far; a field keyed by it drops its draft and shows the settings again.
     drafts: usize,
     font: Entity<TextInput>,
+    ui_font: Entity<TextInput>,
     /// A picker's input for each fallback family, and one for the family being added.
     fallbacks: Vec<Entity<TextInput>>,
     /// The empty picker that adds a fallback shows.
@@ -116,6 +118,7 @@ impl SettingsWindow {
             input
         });
         let font = cx.new(|cx| TextInput::new(window, cx));
+        let ui_font = cx.new(|cx| TextInput::new(window, cx));
         let search = cx.new(|cx| TextInput::new(window, cx).placeholder("Search shortcuts"));
         let typed = cx.subscribe(&shell, |this, input, event: &InputEvent, cx| {
             if let InputEvent::Changed = event {
@@ -135,6 +138,7 @@ impl SettingsWindow {
             failed: None,
             drafts: 0,
             font,
+            ui_font,
             fallbacks: Vec::new(),
             adding: false,
             lit: true,
@@ -332,6 +336,7 @@ impl Render for SettingsWindow {
         // The context sits above the focus root, so its keys work wherever focus is.
         div()
             .size_full()
+            .font_family(cx.theme().font_family.clone())
             .key_context(CONTEXT)
             .map(menus::window_actions)
             .on_action(|_: &CloseSettings, window, _| {

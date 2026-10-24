@@ -25,6 +25,7 @@ impl SettingsStore {
         let path = folder.join("ELYTerminal").join("settings.json");
         let settings = load(&path)?;
         fonts(&settings, cx)
+            .and_then(|()| interface_font(&settings, cx))
             .with_context(|| format!("settings: {} holds a bad value", path.display()))?;
         cx.set_global(Self { settings, path });
         Ok(())
@@ -48,10 +49,27 @@ impl SettingsStore {
         {
             fonts(&next, cx)?;
         }
+        if next.ui_font_family != store.settings.ui_font_family {
+            interface_font(&next, cx)?;
+        }
         save(&store.path, &next)?;
         cx.global_mut::<Self>().settings = next;
         Ok(())
     }
+}
+
+fn interface_font(settings: &Settings, cx: &App) -> anyhow::Result<()> {
+    if let Some(family) = &settings.ui_font_family {
+        let system = cx.text_system();
+        let id = system.resolve_font(&gpui::font(family.clone()));
+        anyhow::ensure!(
+            system
+                .get_font_for_id(id)
+                .is_some_and(|font| font.family == *family),
+            "ui_font_family: the interface cannot load {family:?}"
+        );
+    }
+    Ok(())
 }
 
 /// Checks the terminal can load its family and each fallback; the error names the field.
@@ -165,6 +183,7 @@ mod tests {
         let folder = folder("round");
         let path = folder.join("settings.json");
         let settings = Settings {
+            ui_font_family: Some("Inter".into()),
             font_size: 15.5,
             cursor_style: CursorStyle::Bar,
             dark_theme: Some("catppuccin-latte".into()),

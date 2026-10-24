@@ -1,3 +1,4 @@
+pub mod interface_font;
 mod store;
 pub mod window;
 
@@ -59,6 +60,7 @@ pub struct Settings {
     pub theme: String,
     /// The theme while the system is dark; none keeps `theme`.
     pub dark_theme: Option<String>,
+    pub ui_font_family: Option<String>,
     pub font_family: String,
     /// Families tried in order for a character Font family lacks.
     pub font_fallbacks: Vec<String>,
@@ -98,6 +100,7 @@ impl Default for Settings {
             start_in: StartIn::Home,
             theme: themes::default_id().into(),
             dark_theme: None,
+            ui_font_family: None,
             font_family: "JetBrains Mono".into(),
             font_fallbacks: Vec::new(),
             font_size: 13.0,
@@ -157,6 +160,12 @@ impl Settings {
                 anyhow::ensure!(themes::known(id), "{field} is {id:?}, no built-in theme");
             }
         }
+        anyhow::ensure!(
+            self.ui_font_family
+                .as_ref()
+                .is_none_or(|family| !family.trim().is_empty()),
+            "ui_font_family is blank"
+        );
         anyhow::ensure!(!self.font_family.is_empty(), "font_family is empty");
         anyhow::ensure!(
             !self.font_fallbacks.iter().any(String::is_empty),
@@ -291,6 +300,29 @@ mod tests {
         };
         let error = empty.validate().expect_err("an empty family");
         assert_eq!(error.to_string(), "font_fallbacks holds an empty family");
+    }
+
+    #[test]
+    fn interface_font_is_optional_and_nonblank() {
+        for json in ["{}", r#"{"ui_font_family":null}"#] {
+            let settings: Settings = serde_json::from_str(json).expect("older or default");
+            assert_eq!(settings.ui_font_family, None);
+            assert_eq!(settings.font_family, "JetBrains Mono");
+        }
+        let mut settings = Settings::default();
+        for family in ["", " \t\n", "Inter"] {
+            settings.ui_font_family = Some(family.into());
+            if family.trim().is_empty() {
+                assert_eq!(
+                    settings.validate().unwrap_err().to_string(),
+                    "ui_font_family is blank"
+                );
+            } else {
+                settings.validate().expect("named");
+                let json = serde_json::to_string(&settings).expect("encoded");
+                assert_eq!(serde_json::from_str::<Settings>(&json).unwrap(), settings);
+            }
+        }
     }
 
     #[test]
