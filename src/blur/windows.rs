@@ -30,9 +30,9 @@ const ELEVEN: u32 = 22000;
 static GPUI: AtomicIsize = AtomicIsize::new(0);
 
 /// A window's property while it is blurred, which its moves read.
-const BLURRED: PCWSTR = w!("ElyTerminalBlurred");
+const BLURRED: PCWSTR = w!("luna-terminal-blurred");
 /// A window's property while it moves or sizes, which a change of its blur reads.
-const MOVING: PCWSTR = w!("ElyTerminalMoving");
+const MOVING: PCWSTR = w!("luna-terminal-moving");
 
 /// gpui's accents: acrylic for Blurred, a clear gradient for Transparent.
 const ACRYLIC: u32 = 4;

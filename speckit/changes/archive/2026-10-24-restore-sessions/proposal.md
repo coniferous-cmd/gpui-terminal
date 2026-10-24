@@ -6,7 +6,7 @@ create-time: 2026-10-24 12:04:52
 
 ## Why
 
-ELYTerminal forgets its workspace when it quits. Every launch opens exactly one
+luna-terminal forgets its workspace when it quits. Every launch opens exactly one
 session with one tab in the home folder, because `main.rs` builds a single
 `Launch` and `Workspace::new` makes one tab from it. A user who works in four
 sessions of three tabs each, each in its own folder, rebuilds that by hand at

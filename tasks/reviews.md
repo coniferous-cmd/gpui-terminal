@@ -19,7 +19,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 ## T04
 
 - Round 1, 62e50fe: FAIL. A folder without enter permission started the shell elsewhere; no pid for the app; folder and exit unlogged; grid and pty sizes split past the kernel's cap. Fixed in 96ae85b.
-- Round 2, 96ae85b: FAIL. The permission check raced alacritty's chdir, whose result alacritty ignores; closing a live pty logged nothing. Fixed in fff436c: ELYTerminal's own Unix pty, a checked chdir in pre_exec that fails the spawn, closing and hung-up logs with a test.
+- Round 2, 96ae85b: FAIL. The permission check raced alacritty's chdir, whose result alacritty ignores; closing a live pty logged nothing. Fixed in fff436c: luna-terminal's own Unix pty, a checked chdir in pre_exec that fails the spawn, closing and hung-up logs with a test.
 - Round 3, fff436c: FAIL. Drop waited on the program while holding the master, so a program ignoring SIGHUP never ended. Fixed in 0e7f309: the master closes before the wait; a test that traps HUP went red, then green.
 - The review cap of three rounds is reached. The round-3 fix stands on its red-green test, not a fourth round.
 
@@ -119,7 +119,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 
 ## T24
 
-- Round 1, c0a9eb3..65bb4d3: PASS. Before the review, 65bb4d3 named the icon's parts as SVG groups instead of comments, drawing the same pixels, and made mac-app.sh read the version in a clone named elyterminal. CI run 926 on 65bb4d3 passed on macOS, Ubuntu and Windows.
+- Round 1, c0a9eb3..65bb4d3: PASS. Before the review, 65bb4d3 named the icon's parts as SVG groups instead of comments, drawing the same pixels, and made mac-app.sh read the version in a clone named luna-terminal. CI run 926 on 65bb4d3 passed on macOS, Ubuntu and Windows.
 
 ## T25
 
@@ -142,7 +142,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 
 ## T29
 
-- Round 1, 3e30f95: FAIL. A shell that ran `exec herdr` kept its process group, so the session never looked at its foreground again and the panel stayed where it was; a relative `HERDR_SOCKET_PATH` was looked up from ELYTerminal's own folder, not the client's, so no socket answered. Fixed in 2af45cb: the foreground is its group and the executable its leader runs, a program that did not read is tried again, and a relative socket lies in the client's folder (`/proc/PID/cwd`, `proc_pidinfo` on macOS); on Linux an executable an update replaced still names itself herdr.
+- Round 1, 3e30f95: FAIL. A shell that ran `exec herdr` kept its process group, so the session never looked at its foreground again and the panel stayed where it was; a relative `HERDR_SOCKET_PATH` was looked up from luna-terminal's own folder, not the client's, so no socket answered. Fixed in 2af45cb: the foreground is its group and the executable its leader runs, a program that did not read is tried again, and a relative socket lies in the client's folder (`/proc/PID/cwd`, `proc_pidinfo` on macOS); on Linux an executable an update replaced still names itself herdr.
 - Round 2, 2af45cb: PASS. The reviewer ran real herdr 0.9.5 under the native view: a direct start, a delayed exec, a relative socket, both at once, and a folder with a space and an é each gave the folder events herdr's own snapshot named. CI run 988 on 3e30f95 and run 990 on 2af45cb passed on macOS, Ubuntu and Windows.
 
 ## T30
@@ -153,7 +153,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 
 ## T31
 
-- Round 1, 4364802 and 2a1060c, with release v0.1.2: PASS. The reviewer compared `Cargo.lock` with its parent, where only elyterminal moved to 0.1.2; matched the 112 files of the source the builds came from to the tag byte for byte; downloaded the three files anonymously against their SHA-256s; checked the disk image's notarization and its app's signature, the zip's icon, manifest and imports, and the tarball's glibc 2.35; and ran the downloaded macOS app with herdr 0.9.5: the folder followed herdr's focus, and the window reopened at its kept 923 by 617. CI run 1000 on 4364802 passed on macOS, Ubuntu and Windows before the release was published; Release run 1001 built the notarized disk image.
+- Round 1, 4364802 and 2a1060c, with release v0.1.2: PASS. The reviewer compared `Cargo.lock` with its parent, where only luna-terminal moved to 0.1.2; matched the 112 files of the source the builds came from to the tag byte for byte; downloaded the three files anonymously against their SHA-256s; checked the disk image's notarization and its app's signature, the zip's icon, manifest and imports, and the tarball's glibc 2.35; and ran the downloaded macOS app with herdr 0.9.5: the folder followed herdr's focus, and the window reopened at its kept 923 by 617. CI run 1000 on 4364802 passed on macOS, Ubuntu and Windows before the release was published; Release run 1001 built the notarized disk image.
 
 ## T32
 
@@ -208,7 +208,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 
 ## T41
 
-- Round 1, 7569f00 with release v0.1.3: PASS. The reviewer compared `Cargo.lock` with its parent, where of 844 packages only elyterminal moved, to 0.1.3; matched the 127 files of the tag's source archive to 7569f00 byte for byte; downloaded the three files anonymously against their SHA-256s; checked the disk image's stapled notarization and its app's Developer ID signature, hardened runtime and version 0.1.3, the zip's icon and manifest against their sources byte for byte and its imports, no C runtime DLL among them, and the tarball's three files and glibc 2.35; and matched the notes to T32 to T40. The app was not run, since its first notification asks the owner's leave. CI run 1156 on 7569f00 passed on macOS, Ubuntu and Windows before the release was published; Release run 1157 built the notarized disk image.
+- Round 1, 7569f00 with release v0.1.3: PASS. The reviewer compared `Cargo.lock` with its parent, where of 844 packages only luna-terminal moved, to 0.1.3; matched the 127 files of the tag's source archive to 7569f00 byte for byte; downloaded the three files anonymously against their SHA-256s; checked the disk image's stapled notarization and its app's Developer ID signature, hardened runtime and version 0.1.3, the zip's icon and manifest against their sources byte for byte and its imports, no C runtime DLL among them, and the tarball's three files and glibc 2.35; and matched the notes to T32 to T40. The app was not run, since its first notification asks the owner's leave. CI run 1156 on 7569f00 passed on macOS, Ubuntu and Windows before the release was published; Release run 1157 built the notarized disk image.
 
 ## T42
 
@@ -237,7 +237,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 
 ## T47
 
-- Round 1, 2d9180e and cdafdc2 with release v0.1.4: PASS. The reviewer compared Cargo.lock with its parent, where of 844 packages only elyterminal moved, to 0.1.4; found the release public, its tag and target at 2d9180e; downloaded the three files anonymously against the SHA-256 in the notes, and matched the notes to notes.md and to T44 to T46; read CI run 1215's three jobs, 228 tests on macOS, 234 on Ubuntu and 200 on Windows, done before the release was published, and Release run 1216's notarization; checked the disk image's stapled ticket and Gatekeeper, its app's Developer ID signature, hardened runtime, version 0.1.4, arm64 and macOS 11.0, the zip's icon against its source byte for byte, its manifest and its imports, no C runtime DLL among them, and the tarball's three files, their modes and glibc 2.35; and ran the downloaded app with a HOME of its own: it loaded its settings, started its shell, showed Ely, followed working, waiting, error and done, and quit with its last shell. check.sh passed.
+- Round 1, 2d9180e and cdafdc2 with release v0.1.4: PASS. The reviewer compared Cargo.lock with its parent, where of 844 packages only luna-terminal moved, to 0.1.4; found the release public, its tag and target at 2d9180e; downloaded the three files anonymously against the SHA-256 in the notes, and matched the notes to notes.md and to T44 to T46; read CI run 1215's three jobs, 228 tests on macOS, 234 on Ubuntu and 200 on Windows, done before the release was published, and Release run 1216's notarization; checked the disk image's stapled ticket and Gatekeeper, its app's Developer ID signature, hardened runtime, version 0.1.4, arm64 and macOS 11.0, the zip's icon against its source byte for byte, its manifest and its imports, no C runtime DLL among them, and the tarball's three files, their modes and glibc 2.35; and ran the downloaded app with a HOME of its own: it loaded its settings, started its shell, showed Ely, followed working, waiting, error and done, and quit with its last shell. check.sh passed.
 
 ## T48
 
@@ -271,7 +271,7 @@ Each task gets at most three codex rounds. Each round: the commit, the verdict, 
 
 ## T54
 
-- Round 1, 0119776 and 15153b4 with v0.1.5 published: PASS. The reviewer found the bump only elyterminal's version; downloaded the three files anonymously, each matching the notes' SHA-256 and target/t54/anon byte for byte, and the tag's source archive the commit's 141 files; checked the disk image's ticket, strict signatures and Gatekeeper, the hardened arm64 app at 0.1.5 and macOS 11.0, the zip's GUI executable with its seven icon images, icon group 1, PerMonitorV2 manifest and no C runtime DLL, and the tarball's modes and glibc 2.35; found T51's and the failed glue's markers in all three binaries, T53's in the app and the monitors' in the tarball; and read CI run 1311 succeed on macOS, Ubuntu and Windows at 0119776 a minute before the release was published, and Release run 1312 on the signing runner. check.sh passed with 240 tests. Windows and Linux windows went unexercised.
+- Round 1, 0119776 and 15153b4 with v0.1.5 published: PASS. The reviewer found the bump only luna-terminal's version; downloaded the three files anonymously, each matching the notes' SHA-256 and target/t54/anon byte for byte, and the tag's source archive the commit's 141 files; checked the disk image's ticket, strict signatures and Gatekeeper, the hardened arm64 app at 0.1.5 and macOS 11.0, the zip's GUI executable with its seven icon images, icon group 1, PerMonitorV2 manifest and no C runtime DLL, and the tarball's modes and glibc 2.35; found T51's and the failed glue's markers in all three binaries, T53's in the app and the monitors' in the tarball; and read CI run 1311 succeed on macOS, Ubuntu and Windows at 0119776 a minute before the release was published, and Release run 1312 on the signing runner. check.sh passed with 240 tests. Windows and Linux windows went unexercised.
 
 ## T55
 

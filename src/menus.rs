@@ -8,7 +8,7 @@ use crate::{
 };
 
 actions!(
-    elyterminal,
+    luna_terminal,
     [Quit, Bigger, Smaller, ResetSize, Minimize, Zoom]
 );
 
@@ -21,11 +21,11 @@ pub fn menus() -> Vec<Menu> {
     };
     vec![
         menu(
-            "ELYTerminal",
+            "luna-terminal",
             vec![
                 MenuItem::action("Settings…", OpenSettings),
                 MenuItem::separator(),
-                MenuItem::action("Quit ELYTerminal", Quit),
+                MenuItem::action("Quit luna-terminal", Quit),
             ],
         ),
         menu(

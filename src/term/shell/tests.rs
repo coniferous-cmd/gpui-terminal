@@ -21,7 +21,7 @@ const INNER: &str = "in ner%\u{7}x\ny";
 
 /// A fresh folder under the temp dir, by its real path.
 fn folder(name: &str) -> PathBuf {
-    let folder = env::temp_dir().join(format!("elyterminal-{name}-{}", std::process::id()));
+    let folder = env::temp_dir().join(format!("luna-terminal-{name}-{}", std::process::id()));
     if folder.exists() {
         fs::remove_dir_all(&folder).expect("a stale test folder goes");
     }
@@ -259,12 +259,12 @@ fn a_script_it_cannot_read_fails_the_install() {
     use std::os::unix::fs::PermissionsExt;
     let dir = folder("unreadable");
     install(&dir).expect("installs");
-    let bash = dir.join("bash/elyterminal.bash");
+    let bash = dir.join("bash/luna-terminal.bash");
     fs::set_permissions(&bash, fs::Permissions::from_mode(0o200)).expect("200");
     let error = install(&dir).expect_err("an unreadable script fails");
     fs::set_permissions(&bash, fs::Permissions::from_mode(0o600)).expect("600");
     assert!(
-        format!("{error:#}").contains("bash/elyterminal.bash"),
+        format!("{error:#}").contains("bash/luna-terminal.bash"),
         "{error:#}"
     );
     fs::remove_dir_all(dir).expect("cleanup");
@@ -299,7 +299,7 @@ fn zsh_reports_its_folder_byte_for_byte_and_its_titles() {
 fn zsh_says_why_it_marks_no_prompt_without_prompt_percent() {
     let mut run = Run::start(&installed("zsh"), &[(".zshrc", "unsetopt prompt_percent")]);
     run.until("the warning", |run| {
-        run.shows("ELYTerminal: zsh marks no prompt while prompt_percent is off")
+        run.shows("luna-terminal: zsh marks no prompt while prompt_percent is off")
     });
     run.send("false");
     let ended = [Mark::Output, Mark::Done(Some(1))];
@@ -362,7 +362,7 @@ fn bash_says_why_it_marks_no_command_without_promptvars() {
     ];
     let mut run = Run::start(&installed("bash"), &files);
     run.until("the warning", |run| {
-        run.shows("ELYTerminal: bash marks no command while promptvars is off")
+        run.shows("luna-terminal: bash marks no command while promptvars is off")
     });
     run.walk("declare -F _ely_prompt >/dev/null && echo ELY-LOAD''ED");
     run.ends("false", &[Mark::Prompt(Click::Arrows), Mark::Input]);

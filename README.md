@@ -1,24 +1,24 @@
-# ELYTerminal
+# luna-terminal
 
 A terminal for macOS, Windows and Linux, in Rust on GPUI and Ely components. Sessions sit on the left, the terminal in the middle, Git or Files on the right. Every setting has a control in the settings window.
 
 ## Install
 
-A [release on GitHub](https://github.com/ELY-Open-Source/ELYTerminal/releases) carries three builds.
+A [release on GitHub](https://github.com/ELY-Open-Source/luna-terminal/releases) carries three builds.
 
-- macOS 11 or later, Apple silicon: open `ELYTerminal-VERSION.dmg` and drag ELYTerminal into Applications. The app is signed with Developer ID and notarized.
-- Windows 10 or later, x86_64: unzip `ELYTerminal-VERSION-windows-x86_64.zip` and run `elyterminal.exe`. Keep `conpty.dll` and `OpenConsole.exe` beside it: the bundled Microsoft ConPTY fixes mouse forwarding on Windows 10. The app is unsigned; if SmartScreen stops it, press More info, then Run anyway.
+- macOS 11 or later, Apple silicon: open `Luna Terminal-VERSION.dmg` and drag Luna Terminal into Applications. The app is signed with Developer ID and notarized.
+- Windows 10 or later, x86_64: unzip `luna-terminal-VERSION-windows-x86_64.zip` and run `luna-terminal.exe`. Keep `conpty.dll` and `OpenConsole.exe` beside it: the bundled Microsoft ConPTY fixes mouse forwarding on Windows 10. The app is unsigned; if SmartScreen stops it, press More info, then Run anyway.
 - Linux, x86_64, glibc 2.35 or later, with libxkbcommon, libxkbcommon-x11 and libxcb:
 
 ```sh
-tar -xzf ELYTerminal-VERSION-linux-x86_64.tar.gz
-cd ELYTerminal-VERSION-linux-x86_64
-install -Dm755 elyterminal -t ~/.local/bin
-install -Dm644 com.zacharyzhang.elyterminal.desktop -t ~/.local/share/applications
-install -Dm644 com.zacharyzhang.elyterminal.svg -t ~/.local/share/icons/hicolor/scalable/apps
+tar -xzf luna-terminal-VERSION-linux-x86_64.tar.gz
+cd luna-terminal-VERSION-linux-x86_64
+install -Dm755 luna-terminal -t ~/.local/bin
+install -Dm644 com.zacharyzhang.luna-terminal.desktop -t ~/.local/share/applications
+install -Dm644 com.zacharyzhang.luna-terminal.svg -t ~/.local/share/icons/hicolor/scalable/apps
 ```
 
-The desktop entry runs `elyterminal`, so `~/.local/bin` must be on `PATH`.
+The desktop entry runs `luna-terminal`, so `~/.local/bin` must be on `PATH`.
 
 ## Build and run
 
@@ -37,7 +37,7 @@ cargo run
 
 For `cargo run --release`, pass `-Directory target/release` to the preparation script. The script downloads the official NuGet package and checks its SHA256; Windows release packaging runs it automatically. Without these files, Windows 10's system ConPTY does not forward mouse-mode requests, so programs such as herdr receive no mouse events.
 
-Each platform's script builds its release in `target/release`: on macOS, `scripts/mac-app.sh` builds `ELYTerminal.app`, with its icon, and a disk image of it; on Windows, `scripts/windows-zip.ps1` zips `elyterminal.exe`, its icon inside, with Microsoft's ConPTY runtime and license; on Linux, `scripts/linux-tar.sh` builds in Docker and packs the binary with its desktop entry and icon.
+Each platform's script builds its release in `target/release`: on macOS, `scripts/mac-app.sh` builds `Luna Terminal.app`, with its icon, and a disk image of it; on Windows, `scripts/windows-zip.ps1` zips `luna-terminal.exe`, its icon inside, with Microsoft's ConPTY runtime and license; on Linux, `scripts/linux-tar.sh` builds in Docker and packs the binary with its desktop entry and icon.
 
 On Linux, install the libraries gpui links first. On Debian and Ubuntu:
 
@@ -46,7 +46,7 @@ sudo apt-get install pkg-config libwayland-dev libxkbcommon-dev libxkbcommon-x11
   libxcb1-dev libx11-xcb-dev libfontconfig-dev libfreetype-dev
 ```
 
-The app writes its log to stderr. `RUST_LOG=elyterminal=debug` writes more; `trace` logs each paint. A Windows release build opens no console: `elyterminal.exe 2> log.txt` keeps its log.
+The app writes its log to stderr. `RUST_LOG=luna_terminal=debug` writes more; `trace` logs each paint. A Windows release build opens no console: `luna-terminal.exe 2> log.txt` keeps its log.
 
 ## What it does
 
@@ -91,9 +91,9 @@ Settings › Terminal lists them all, as this platform binds them.
 
 The settings window saves each change at once to `settings.json` in the platform's config folder:
 
-- macOS: `~/Library/Application Support/ELYTerminal/settings.json`
-- Linux: `$XDG_CONFIG_HOME/ELYTerminal/settings.json`, else `~/.config/ELYTerminal/settings.json`
-- Windows: `%APPDATA%\ELYTerminal\settings.json`
+- macOS: `~/Library/Application Support/luna-terminal/settings.json`
+- Linux: `$XDG_CONFIG_HOME/luna-terminal/settings.json`, else `~/.config/luna-terminal/settings.json`
+- Windows: `%APPDATA%\luna-terminal\settings.json`
 
 A file that does not parse, or holds a value out of range, stops the start with an error naming the file and the field. The app never overwrites it.
 

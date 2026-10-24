@@ -23,7 +23,7 @@ mod appearance;
 mod interface_font;
 mod terminal;
 
-actions!(elyterminal, [OpenSettings, CloseSettings]);
+actions!(luna_terminal, [OpenSettings, CloseSettings]);
 
 /// The key context of the settings window's content.
 const CONTEXT: &str = "Settings";

@@ -22,7 +22,7 @@ create-time: 2026-10-24 12:06:19
   that is not UTF-8 (Unix only).
 
 - [x] 1.3 Add `SessionStore` to `src/sessions/state.rs`: `init(cx)` loading the
-  file at `dirs::config_dir()/ELYTerminal/sessions.json` and logging a drop with
+  file at `dirs::config_dir()/luna-terminal/sessions.json` and logging a drop with
   its reason, `note(cx, snapshot, write)` comparing `current` with `saved`, and
   `flush(cx)`. A failed write logs and leaves `saved` behind, so the next
   `note(…, true)` tries again. Verify with unit tests: a selection-only note

@@ -67,7 +67,7 @@ fn only_herdr_s_terminal_client_is_followed() {
 
 fn reply(focused_pane: &str, cwd: &str) -> String {
     format!(
-        r#"{{"id":"elyterminal","result":{{"type":"session_snapshot","snapshot":{{"version":"0.9.5","protocol":22,"focused_pane_id":{focused_pane},"workspaces":[],"tabs":[],"panes":[{{"pane_id":"w1:p1","cwd":"/a","focused":false}},{{"pane_id":"w1:p2","cwd":{cwd},"focused":true}}],"layouts":[],"agents":[]}}}}}}"#
+        r#"{{"id":"luna-terminal","result":{{"type":"session_snapshot","snapshot":{{"version":"0.9.5","protocol":22,"focused_pane_id":{focused_pane},"workspaces":[],"tabs":[],"panes":[{{"pane_id":"w1:p1","cwd":"/a","focused":false}},{{"pane_id":"w1:p2","cwd":{cwd},"focused":true}}],"layouts":[],"agents":[]}}}}}}"#
     )
 }
 
@@ -90,7 +90,7 @@ fn the_focused_pane_s_folder_comes_from_herdr_s_snapshot() {
     let error = read(r#""w1:p2""#, r#""b""#).expect_err("a relative folder");
     assert!(error.to_string().contains("relative"), "{error}");
     let failed =
-        r#"{"id":"elyterminal","error":{"code":"invalid_request","message":"no such method"}}"#;
+        r#"{"id":"luna-terminal","error":{"code":"invalid_request","message":"no such method"}}"#;
     let error = shows(failed).expect_err("an error");
     assert_eq!(error.to_string(), "invalid_request: no such method");
     assert!(shows("").is_err());
@@ -171,7 +171,7 @@ fn herdr_s_agents_whose_state_it_knows_are_records_by_pane() {
 #[test]
 fn herdr_answers_over_its_socket() {
     use std::{fs, os::unix::net::UnixListener};
-    let dir = std::env::temp_dir().join(format!("elyterminal-herdr-{}", std::process::id()));
+    let dir = std::env::temp_dir().join(format!("luna-terminal-herdr-{}", std::process::id()));
     if dir.exists() {
         fs::remove_dir_all(&dir).expect("a stale test folder goes");
     }
@@ -355,7 +355,7 @@ fn herdr_answers_over_its_pipe() {
         System::Pipes::{ConnectNamedPipe, CreateNamedPipeW, PIPE_TYPE_BYTE},
     };
     let socket = PathBuf::from(format!(
-        r"C:\elyterminal-herdr-{}\herdr.sock",
+        r"C:\luna-terminal-herdr-{}\herdr.sock",
         std::process::id()
     ));
     let name = format!(r"\\.\pipe\{}", socket.display());

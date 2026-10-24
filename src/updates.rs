@@ -12,11 +12,11 @@ use serde::Deserialize;
 use crate::{settings::SettingsStore, workspace::TITLE};
 
 /// The latest published release.
-const LATEST: &str = "https://api.github.com/repos/ELY-Open-Source/ELYTerminal/releases/latest";
+const LATEST: &str = "https://api.github.com/repos/ELY-Open-Source/luna-terminal/releases/latest";
 /// How long an automatic check waits for the next.
 const DAY: Duration = Duration::from_secs(24 * 60 * 60);
 /// The tag a newer release's notification carries.
-const TAG: &str = "elyterminal-update";
+const TAG: &str = "luna-terminal-update";
 /// The running version.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -79,7 +79,7 @@ fn finish(found: anyhow::Result<Option<(String, String)>>, auto: bool, cx: &mut 
                 cx.show_system_notification(SystemNotification {
                     tag: TAG.into(),
                     title: TITLE.into(),
-                    body: format!("ELYTerminal {version} is out. Press to open its page.").into(),
+                    body: format!("luna-terminal {version} is out. Press to open its page.").into(),
                     actions: Vec::new(),
                 });
             }
@@ -198,7 +198,7 @@ mod tests {
 
     #[test]
     fn github_s_release_reads() {
-        let body = r#"{"id":213,"tag_name":"v0.1.5","name":"ELYTerminal 0.1.5","html_url":"https://github.com/ELY-Open-Source/ELYTerminal/releases/tag/v0.1.5","draft":false,"assets":[]}"#;
+        let body = r#"{"id":213,"tag_name":"v0.1.5","name":"luna-terminal 0.1.5","html_url":"https://github.com/ELY-Open-Source/luna-terminal/releases/tag/v0.1.5","draft":false,"assets":[]}"#;
         let release: Release = serde_json::from_str(body).expect("a release");
         assert_eq!(release.tag_name, "v0.1.5");
         assert!(release.html_url.ends_with("/releases/tag/v0.1.5"));

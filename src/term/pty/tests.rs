@@ -330,7 +330,7 @@ fn a_missing_folder_stops_the_start() {
 #[test]
 fn a_folder_that_cannot_be_entered_stops_the_start() {
     use std::os::unix::fs::PermissionsExt;
-    let folder = std::env::temp_dir().join(format!("elyterminal-shut-{}", std::process::id()));
+    let folder = std::env::temp_dir().join(format!("luna-terminal-shut-{}", std::process::id()));
     std::fs::create_dir_all(&folder).expect("a temp folder");
     std::fs::set_permissions(&folder, std::fs::Permissions::from_mode(0o600)).expect("600");
     let launch = Launch {

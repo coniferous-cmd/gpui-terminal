@@ -37,7 +37,7 @@ pub use restore::{Opening, Started};
 use widths::{Dragged, Side};
 
 actions!(
-    elyterminal,
+    luna_terminal,
     [
         ToggleSessions,
         TogglePanel,
@@ -55,14 +55,14 @@ actions!(
 
 /// Shows a tab by position; an out-of-range binding passes to the program.
 #[derive(Clone, Debug, PartialEq, Action)]
-#[action(namespace = elyterminal, no_json)]
+#[action(namespace = luna_terminal, no_json)]
 pub struct SelectTab(pub usize);
 
 /// The key context of the main window's content.
 pub const CONTEXT: &str = "Workspace";
 
 /// The window's title while the program names none.
-pub const TITLE: &str = "ELYTerminal";
+pub const TITLE: &str = "luna-terminal";
 
 /// The main window's content: sessions, the terminal, and Git or Files, in Ely's columns.
 pub struct Workspace {

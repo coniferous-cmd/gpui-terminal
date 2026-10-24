@@ -63,7 +63,7 @@ Progress truth. Top to bottom, one at a time. A task is ticked only after its co
 
 ## 14. Icon and the macOS app
 
-- [x] T24 Icon: Ely holding a terminal, on macOS's rounded square and alone for Windows and Linux; `scripts/mac-app.sh` builds `ELYTerminal.app` and its disk image.
+- [x] T24 Icon: Ely holding a terminal, on macOS's rounded square and alone for Windows and Linux; `scripts/mac-app.sh` builds `luna-terminal.app` and its disk image.
 
 ## 15. Release
 
@@ -80,10 +80,10 @@ Progress truth. Top to bottom, one at a time. A task is ticked only after its co
 
 ## 18. herdr
 
-- [x] T29 Inside herdr the right column follows herdr's focused pane, which the owner found frozen: herdr keeps its panes' OSC 7, so on macOS and Linux ELYTerminal reads the folder from herdr's socket while herdr's client runs in the session's foreground.
+- [x] T29 Inside herdr the right column follows herdr's focused pane, which the owner found frozen: herdr keeps its panes' OSC 7, so on macOS and Linux luna-terminal reads the folder from herdr's socket while herdr's client runs in the session's foreground.
 - [x] T30 The main window opens at the size it was left at, on macOS, Windows and Linux, which the owner asked for: the size is kept in the settings.
 - [x] T31 Release v0.1.2 with T29 and T30: version 0.1.2; the macOS disk image, the Windows zip and the Linux tarball, each from its script; the notes say it fixes herdr compatibility and keeps the window's size.
-- [x] T32 On Windows the right column follows herdr's focused pane too, which the owner found frozen there: ELYTerminal finds herdr's client under the session's shell, reads its arguments and variables, and asks herdr's named pipe.
+- [x] T32 On Windows the right column follows herdr's focused pane too, which the owner found frozen there: luna-terminal finds herdr's client under the session's shell, reads its arguments and variables, and asks herdr's named pipe.
 
 ## 19. Column widths
 
@@ -143,7 +143,7 @@ Progress truth. Top to bottom, one at a time. A task is ticked only after its co
 ## 30. Ely's drag, updates and the scrollbar
 
 - [x] T55 A drag moves Ely along the edge she stands on, which the owner asked for after 0.1.5: she follows the pointer sideways inside the pane, on macOS, Windows and X11 as it moves, on Wayland, whose popup keeps its place, once it lets go; where she stands, in points from the pane's left edge, the settings keep as `ely_left`.
-- [x] T56 Settings › Terminal checks for updates, which the owner asked for after 0.1.5: under Ely, a switch checks ELYTerminal's latest release at start and once a day, on by default, and a button checks at once; the row says what the check found, and a newer release brings a button that opens its page; a newer release an automatic check finds posts a system notification, whose press opens that page.
+- [x] T56 Settings › Terminal checks for updates, which the owner asked for after 0.1.5: under Ely, a switch checks luna-terminal's latest release at start and once a day, on by default, and a button checks at once; the row says what the check found, and a newer release brings a button that opens its page; a newer release an automatic check finds posts a system notification, whose press opens that page.
 - [x] T58 The terminal shows a scrollbar over its history, which a user asked for in issue #2 after 0.1.5, since a program that takes the mouse takes the wheel too: a thumb along its right edge, in Ely's sizes and colors, stands where the view stands in the history, and a drag on it moves the view through it; none shows without history, as on the alternate screen, and a press on it never reaches the terminal.
 
 ## 31. Release

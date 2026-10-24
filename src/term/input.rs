@@ -12,7 +12,7 @@ use super::{
     view::TerminalView,
 };
 
-actions!(elyterminal, [Find, FindNewer, PreviousPrompt, NextPrompt]);
+actions!(luna_terminal, [Find, FindNewer, PreviousPrompt, NextPrompt]);
 
 /// The key context a terminal's root sets.
 pub const CONTEXT: &str = "Terminal";

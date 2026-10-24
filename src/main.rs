@@ -2,8 +2,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use ely_gpui_component::Assets;
-use elyterminal::app;
 use gpui::App;
+use luna_terminal::app;
 
 /// A Linux app with no display server fails at start instead of running headless.
 #[cfg(target_os = "linux")]
@@ -24,8 +24,10 @@ fn run(cx: &mut App) -> anyhow::Result<()> {
 }
 
 fn main() {
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("elyterminal=info"))
-        .init();
+    env_logger::Builder::from_env(
+        env_logger::Env::default().default_filter_or("luna_terminal=info"),
+    )
+    .init();
     application().with_assets(Assets).run(|cx: &mut App| {
         ely_gpui_component::init(cx).expect("Ely failed to start");
         if let Err(error) = run(cx) {

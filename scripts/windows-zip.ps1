@@ -8,9 +8,9 @@ $arch = @{ AMD64 = 'x86_64'; ARM64 = 'aarch64' }[$env:PROCESSOR_ARCHITECTURE]
 if (-not $arch) { throw "windows-zip: no name for $env:PROCESSOR_ARCHITECTURE" }
 $target = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { 'target' }
 $out = Join-Path $target 'release'
-$zip = Join-Path $out "ELYTerminal-$version-windows-$arch.zip"
+$zip = Join-Path $out "luna-terminal-$version-windows-$arch.zip"
 & (Join-Path $PSScriptRoot 'windows-conpty.ps1') -Directory $out
-$files = @('elyterminal.exe', 'conpty.dll', 'OpenConsole.exe', 'conpty.txt') |
+$files = @('luna-terminal.exe', 'conpty.dll', 'OpenConsole.exe', 'conpty.txt') |
     ForEach-Object { Join-Path $out $_ }
 Compress-Archive -Force -Path $files -DestinationPath $zip -ErrorAction Stop
 Write-Output "windows-zip: $zip"

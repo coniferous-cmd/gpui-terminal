@@ -1,4 +1,4 @@
-# ELYTerminal: restore XDG_DATA_DIRS, report the folder, mark what this fish leaves unmarked; fish_title keeps the title.
+# luna-terminal: restore XDG_DATA_DIRS, report the folder, mark what this fish leaves unmarked; fish_title keeps the title.
 if test -n "$ELY_FISH_XDG_DATA_DIRS"
     set -gx XDG_DATA_DIRS $ELY_FISH_XDG_DATA_DIRS
 else

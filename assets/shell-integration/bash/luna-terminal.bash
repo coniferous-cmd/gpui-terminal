@@ -1,4 +1,4 @@
-# ELYTerminal: load the usual startup files, report folder and title, mark prompts and commands.
+# luna-terminal: load the usual startup files, report folder and title, mark prompts and commands.
 if [ -n "${ELY_BASH_LOGIN-}" ]; then
   builtin unset ELY_BASH_LOGIN
   [ -r /etc/profile ] && builtin source /etc/profile
@@ -53,4 +53,4 @@ _ely_mark() {
 }
 PROMPT_COMMAND="_ely_prompt${PROMPT_COMMAND:+;$PROMPT_COMMAND};_ely_mark"
 # PS0 and the prompt mark a command only through expansions, which promptvars turns on.
-builtin shopt -q promptvars || builtin printf 'ELYTerminal: bash marks no command while promptvars is off (shopt -s promptvars)\n' >&2
+builtin shopt -q promptvars || builtin printf 'luna-terminal: bash marks no command while promptvars is off (shopt -s promptvars)\n' >&2

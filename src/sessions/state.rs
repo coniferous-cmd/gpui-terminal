@@ -166,7 +166,7 @@ impl SessionStore {
     /// Loads `sessions.json` into the app; a file it cannot use is logged and dropped.
     pub fn init(cx: &mut App) -> anyhow::Result<()> {
         let folder = dirs::config_dir().context("sessions: the platform names no config folder")?;
-        let path = folder.join("ELYTerminal").join(FILE);
+        let path = folder.join("luna-terminal").join(FILE);
         let loaded = match load(&path) {
             Ok(Some(snapshot)) => {
                 log::info!(
@@ -254,7 +254,7 @@ mod tests {
 
     fn folder(name: &str) -> PathBuf {
         let folder =
-            std::env::temp_dir().join(format!("elyterminal-state-{name}-{}", std::process::id()));
+            std::env::temp_dir().join(format!("luna-terminal-state-{name}-{}", std::process::id()));
         if folder.exists() {
             fs::remove_dir_all(&folder).expect("a stale test folder goes");
         }

@@ -1746,46 +1746,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "elyterminal"
-version = "0.1.7"
-dependencies = [
- "alacritty_terminal",
- "anyhow",
- "base64",
- "block",
- "core-graphics 0.24.0",
- "dirs 7.0.0",
- "ely-gpui-component",
- "embed-resource",
- "env_logger",
- "foreign-types",
- "futures",
- "gethostname",
- "gpui-pre",
- "gpui-pre-platform",
- "image",
- "libc",
- "log",
- "objc",
- "polling",
- "raw-window-handle",
- "resvg",
- "rustix-openpty",
- "serde",
- "serde_json",
- "serde_path_to_error",
- "signal-hook",
- "sysinfo 0.39.6",
- "unicode-normalization",
- "wayland-backend",
- "wayland-client",
- "wayland-protocols",
- "wayland-server",
- "windows-sys 0.61.2",
- "x11rb",
-]
-
-[[package]]
 name = "embed-resource"
 version = "3.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3731,6 +3691,46 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef9ac18847474e638e3702b76c65d4eb93428471a74778ef0f1be711717f89b5"
 dependencies = [
  "hashbrown 0.17.1",
+]
+
+[[package]]
+name = "luna-terminal"
+version = "0.1.7"
+dependencies = [
+ "alacritty_terminal",
+ "anyhow",
+ "base64",
+ "block",
+ "core-graphics 0.24.0",
+ "dirs 7.0.0",
+ "ely-gpui-component",
+ "embed-resource",
+ "env_logger",
+ "foreign-types",
+ "futures",
+ "gethostname",
+ "gpui-pre",
+ "gpui-pre-platform",
+ "image",
+ "libc",
+ "log",
+ "objc",
+ "polling",
+ "raw-window-handle",
+ "resvg",
+ "rustix-openpty",
+ "serde",
+ "serde_json",
+ "serde_path_to_error",
+ "signal-hook",
+ "sysinfo 0.39.6",
+ "unicode-normalization",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-protocols",
+ "wayland-server",
+ "windows-sys 0.61.2",
+ "x11rb",
 ]
 
 [[package]]

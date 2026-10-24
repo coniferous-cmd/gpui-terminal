@@ -25,7 +25,7 @@ Three facts shape the design:
 ## Decisions
 
 - **The snapshot is its own file.** `sessions.json` sits beside `settings.json`
-  under `dirs::config_dir()/ELYTerminal/`. It is machine-written and changes for
+  under `dirs::config_dir()/luna-terminal/`. It is machine-written and changes for
   reasons settings do not: a bad snapshot must never stop the start, while a bad
   `settings.json` must. Session layout is also not a user-editable setting, and
   `settings.json` stays small.

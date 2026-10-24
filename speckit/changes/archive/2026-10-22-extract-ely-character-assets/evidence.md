@@ -30,7 +30,7 @@ A second one-off `#[ignore]`d test (deleted after it ran, so no second asset imp
 
 ## 3.1 Runs outside the checkout
 
-`target/debug/elyterminal.exe` copied to `target/pet-verify/` (no `assets/` there) and launched from that folder with `RUST_LOG=elyterminal=debug`:
+`target/debug/luna-terminal.exe` copied to `target/pet-verify/` (no `assets/` there) and launched from that folder with `RUST_LOG=luna_terminal=debug`:
 
 - `pet: Ely peeks over the main window, a window kept there, on the pane's top edge, feeling Calm` — she showed from embedded resources alone.
 - The user's existing `settings.json` was used unchanged; no settings migration.

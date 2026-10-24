@@ -1,11 +1,11 @@
 [package]
-name = "elyterminal"
+name = "luna-terminal"
 version = "0.1.7"
 edition = "2024"
 rust-version = "1.95"
 license = "MIT"
 description = "A terminal on GPUI and Ely."
-repository = "https://github.com/ELY-Open-Source/ELYTerminal"
+repository = "https://github.com/ELY-Open-Source/luna-terminal"
 publish = false
 
 [dependencies]

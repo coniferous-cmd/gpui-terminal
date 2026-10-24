@@ -1,4 +1,4 @@
-# ELYTerminal PRD
+# luna-terminal PRD
 
 A terminal for macOS, Windows and Linux. Rust, GPUI, Ely components. It draws a terminal as well as Ghostty does, shows every setting on screen, and makes no noise.
 
@@ -15,16 +15,16 @@ Chapters run in build order. `TASKS.md` follows them line by line.
 
 ## 2. Foundation
 
-- One binary crate, `elyterminal`, edition 2024, Rust 1.95.
+- One binary crate, `luna-terminal`, edition 2024, Rust 1.95.
 - Ely from github.com/ELY-Open-Source by pinned rev. gpui, gpui_platform from crates.io `gpui-pre` at the exact version Ely pins.
 - `alacritty_terminal` 0.26 for the grid, the parser and the pseudo-terminal, as Ely uses it.
 - Logs through `log` to stderr, `RUST_LOG` sets the level. No log setting in the app.
 - CI on GitHub Actions: macOS builds, tests and lints; Ubuntu and Windows build and test.
-- Repo `ELY-Open-Source/ELYTerminal` on GitHub, public; it lived on git.zacharyzhang.com until v0.1.7. No credential in any file or commit.
+- Repo `ELY-Open-Source/luna-terminal` on GitHub, public; it lived on git.zacharyzhang.com until v0.1.7. No credential in any file or commit.
 
 ## 3. Settings model and storage
 
-- One JSON file, `settings.json`, in the platform config folder (`dirs::config_dir()/ELYTerminal`).
+- One JSON file, `settings.json`, in the platform config folder (`dirs::config_dir()/luna-terminal`).
 - Every field has a default. A missing file means defaults. A missing field means its default.
 - A file that does not parse, or a value out of range, stops the start with an error naming the file and the field. The app never overwrites a file it could not read.
 - Writes go to a temp file in the same folder, then rename. One writer: the app's settings entity.
@@ -40,7 +40,7 @@ Chapters run in build order. `TASKS.md` follows them line by line.
 
 ## 5. Terminal engine
 
-Ghostty is the bar for what the terminal does. ELYTerminal owns its engine on `alacritty_terminal`; Ely's `Terminal` is a gallery widget without mouse reporting, IME, kitty keys or style settings.
+Ghostty is the bar for what the terminal does. luna-terminal owns its engine on `alacritty_terminal`; Ely's `Terminal` is a gallery widget without mouse reporting, IME, kitty keys or style settings.
 
 - PTY: alacritty's `tty` and event loop. The pty is wrapped so its reader passes bytes through an OSC scanner. The scanner reports the working directory and prompt marks.
 - Shell integration for zsh, bash, fish and PowerShell, injected at launch as Ghostty does: each prompt sends OSC 7 and a title. A shell without integration reports nothing, and the panels say so.
@@ -132,13 +132,13 @@ Cmd-, opens it; on Windows and Linux, which have no menu bar, so does a gear in 
 
 - macOS: gpui's `WindowBackgroundAppearance::Blurred` (NSVisualEffectView).
 - Windows: gpui's `Blurred` (acrylic accent). On Windows 10, whose DWM drags an acrylic window seconds behind the pointer, the glass clears while the window moves or sizes and blurs again when it rests; Windows 11 keeps its acrylic throughout.
-- Wayland: gpui's `Blurred` speaks `org_kde_kwin_blur`; ELYTerminal adds `ext_background_effect_v1` on the window's surface, which GNOME 51, Plasma 6.7 and Hyprland support. Hyprland honors it only while its own blur is on, which Omarchy 4.0.4 turns off.
-- X11: ELYTerminal sets `_KDE_NET_WM_BLUR_BEHIND_REGION` (CARDINAL, 32) on the window, as Ghostty does; removes it when blur turns off.
+- Wayland: gpui's `Blurred` speaks `org_kde_kwin_blur`; luna-terminal adds `ext_background_effect_v1` on the window's surface, which GNOME 51, Plasma 6.7 and Hyprland support. Hyprland honors it only while its own blur is on, which Omarchy 4.0.4 turns off.
+- X11: luna-terminal sets `_KDE_NET_WM_BLUR_BEHIND_REGION` (CARDINAL, 32) on the window, as Ghostty does; removes it when blur turns off.
 - A compositor with neither protocol shows transparency without blur. The app logs which path it took.
 
 ## 12. Menus and shortcuts
 
-- macOS menu bar: ELYTerminal (Settings, Quit), Shell (New Tab, Close Tab, New Session, Close Session), Edit (Copy, Paste, Select All, Find), View (Toggle Sessions, Toggle Right Panel, Bigger, Smaller, Reset Size), Window.
+- macOS menu bar: luna-terminal (Settings, Quit), Shell (New Tab, Close Tab, New Session, Close Session), Edit (Copy, Paste, Select All, Find), View (Toggle Sessions, Toggle Right Panel, Bigger, Smaller, Reset Size), Window.
 - The same shortcuts on Windows and Linux with Ctrl-Shift for terminal-colliding keys. On Windows Ctrl-V pastes too, as in Windows Terminal.
 
 ## 13. Acceptance
@@ -151,12 +151,12 @@ Cmd-, opens it; on Windows and Linux, which have no menu bar, so does a gear in 
 
 - The icon is Ely, a girl with long pink hair, holding a terminal in front of her.
 - macOS: the icon on the rounded square macOS gives app icons. Windows and Linux: the figure alone, no ground, flat, as Papirus draws.
-- `scripts/mac-app.sh` builds `ELYTerminal.app` from a release build with its icon, signed ad hoc, or for a release with Developer ID and notarized, and a disk image holding it beside a link to Applications.
+- `scripts/mac-app.sh` builds `luna-terminal.app` from a release build with its icon, signed ad hoc, or for a release with Developer ID and notarized, and a disk image holding it beside a link to Applications.
 
 ## 15. Release
 
 - A release on GitHub, tagged `vVERSION`, carries three builds: the macOS disk image (Apple silicon, signed with Developer ID and notarized), a Windows zip (x86_64) and a Linux tarball (x86_64).
-- The Windows executable carries the icon. The Linux tarball carries the icon and a desktop entry, and the window names itself after it, `com.zacharyzhang.elyterminal`, as the macOS bundle does.
+- The Windows executable carries the icon. The Linux tarball carries the icon and a desktop entry, and the window names itself after it, `com.zacharyzhang.luna-terminal`, as the macOS bundle does.
 - Each build comes from its platform's script: `scripts/mac-app.sh`, `scripts/windows-zip.ps1`, `scripts/linux-tar.sh`. The macOS one runs on the signing runner, through the Release workflow.
 
 ## Deferred

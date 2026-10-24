@@ -7,7 +7,7 @@ mod interface;
 #[cfg(target_os = "macos")]
 fn main() {
     interface::run();
-    use elyterminal::term::load_font;
+    use luna_terminal::term::load_font;
     let system = gpui::TextSystem::new(gpui_platform::current_platform(true).text_system());
     assert!(load_font(&gpui::font("Menlo"), &system).is_ok());
     // A family missing, and one gpui passes over for lacking an `m`.

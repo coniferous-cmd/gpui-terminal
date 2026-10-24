@@ -31,7 +31,8 @@ const CHECK: Duration = Duration::from_millis(500);
 const WAIT: Duration = Duration::from_secs(1);
 
 /// The socket request for herdr's session: its focus, its panes' folders and its agents.
-const SNAPSHOT: &[u8] = b"{\"id\":\"elyterminal\",\"method\":\"session.snapshot\",\"params\":{}}\n";
+const SNAPSHOT: &[u8] =
+    b"{\"id\":\"luna-terminal\",\"method\":\"session.snapshot\",\"params\":{}}\n";
 
 /// A program's arguments, and its variables as the system holds them.
 type Invocation = (Vec<String>, HashMap<String, OsString>);

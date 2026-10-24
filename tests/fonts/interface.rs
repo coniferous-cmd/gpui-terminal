@@ -4,17 +4,17 @@ use ely_gpui_component::{
     Assets,
     theme::{ActiveTheme, Mode, Theme},
 };
-use elyterminal::settings::{Settings, SettingsStore, interface_font, load};
 use gpui::{App, Application};
+use luna_terminal::settings::{Settings, SettingsStore, interface_font, load};
 
 pub fn run() {
-    let root = std::env::temp_dir().join(format!("elyterminal-ui-font-{}", std::process::id()));
+    let root = std::env::temp_dir().join(format!("luna-terminal-ui-font-{}", std::process::id()));
     fs::create_dir_all(&root).expect("isolated home");
     // This test process has no threads or platform yet.
     unsafe { std::env::set_var("HOME", &root) };
     let path = dirs::config_dir()
         .expect("config")
-        .join("ELYTerminal/settings.json");
+        .join("luna-terminal/settings.json");
     assert!(path.starts_with(&root), "never touch real settings");
     fs::create_dir_all(path.parent().unwrap()).expect("config folder");
     fs::write(

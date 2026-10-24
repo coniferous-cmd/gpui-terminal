@@ -144,8 +144,10 @@ mod tests {
 
     /// A folder of this test's own, made under the temp folder.
     fn made(name: &str) -> PathBuf {
-        let folder =
-            std::env::temp_dir().join(format!("elyterminal-restore-{name}-{}", std::process::id()));
+        let folder = std::env::temp_dir().join(format!(
+            "luna-terminal-restore-{name}-{}",
+            std::process::id()
+        ));
         fs::create_dir_all(&folder).expect("folder");
         folder
     }

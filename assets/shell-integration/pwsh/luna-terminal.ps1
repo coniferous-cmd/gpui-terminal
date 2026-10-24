@@ -1,4 +1,4 @@
-# ELYTerminal: wrap the prompt to report folder and title and to mark prompts and commands.
+# luna-terminal: wrap the prompt to report folder and title and to mark prompts and commands.
 $global:ElyPrompt = $function:prompt
 $global:ElyRan = $false
 function global:prompt {
@@ -61,5 +61,5 @@ if (Test-Path Function:\PSConsoleHostReadLine) {
         $line
     }
 } else {
-    [Console]::Error.WriteLine('ELYTerminal: PowerShell marks no command without PSReadLine')
+    [Console]::Error.WriteLine('luna-terminal: PowerShell marks no command without PSReadLine')
 }

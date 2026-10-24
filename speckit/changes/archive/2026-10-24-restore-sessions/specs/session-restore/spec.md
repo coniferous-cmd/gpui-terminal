@@ -58,7 +58,7 @@ write once when the app quits, keeping the selection of that moment.
 ### Requirement: The snapshot lives in its own file
 
 The snapshot SHALL be stored in a file of its own beside `settings.json`, in the
-platform's config folder under `ELYTerminal`, and SHALL be written whole through
+platform's config folder under `luna-terminal`, and SHALL be written whole through
 a temporary file renamed over it. It SHALL NOT be a field of `settings.json`,
 and no setting SHALL depend on it.
 
