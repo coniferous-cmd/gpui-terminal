@@ -18,6 +18,7 @@ use crate::{
 };
 
 pub mod orb;
+pub mod state;
 
 use orb::Look;
 

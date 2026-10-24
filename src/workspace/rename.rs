@@ -67,6 +67,7 @@ impl Workspace {
         if held && let Some(shown) = self.sessions.get(self.active) {
             window.focus(&shown.current().terminal.focus_handle(cx), cx);
         }
+        self.note(true, cx);
         self.retitle(window);
         cx.notify();
     }

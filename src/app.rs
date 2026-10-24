@@ -11,10 +11,15 @@ use gpui::{
 use crate::term::mac;
 use crate::{
     blur, menus,
+    sessions::state::SessionStore,
     settings::{self, SettingsStore},
-    term::{ICONS, Launch, MONO, config, input, shell::ShellIntegration, spawn},
+    term::{
+        ICONS, Launch, MONO, config, input,
+        shell::{self, ShellIntegration},
+        spawn,
+    },
     themes, updates,
-    workspace::{self, TITLE, Workspace},
+    workspace::{self, Opening, Started, TITLE, Workspace},
 };
 
 /// How long the window's size holds before it is kept, so a drag saves once.
@@ -45,6 +50,7 @@ pub fn start(cx: &mut App) -> anyhow::Result<()> {
         );
     }
     SettingsStore::init(cx)?;
+    SessionStore::init(cx)?;
     settings::interface_font::init(cx);
     updates::start(cx);
     ShellIntegration::init(cx)?;
@@ -80,8 +86,15 @@ pub fn start(cx: &mut App) -> anyhow::Result<()> {
             .any(|window| window.downcast::<Workspace>().is_some())
         {
             log::info!("app: no terminal window left; quitting");
+            SessionStore::flush(cx);
             cx.quit();
         }
+    })
+    .detach();
+    // Cmd-Q leaves the windows standing, so the layout is flushed here instead.
+    cx.on_app_quit(|cx| {
+        SessionStore::flush(cx);
+        async {}
     })
     .detach();
     #[cfg(target_os = "macos")]
@@ -108,8 +121,48 @@ pub fn start(cx: &mut App) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Opens the main window running `launch`.
+/// Opens the main window running `launch` as one session of one tab, keeping no layout.
 pub fn open(launch: Launch, cx: &mut App) -> anyhow::Result<WindowHandle<Workspace>> {
+    SessionStore::forget(cx);
+    let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
+    let tabs = vec![Started {
+        pty,
+        events,
+        launch,
+    }];
+    open_layout(vec![Opening::of(String::new(), 0, tabs)], 0, cx)
+}
+
+/// Opens the main window on the layout the last quit left, or one home session when none is left.
+pub fn open_saved(cx: &mut App) -> anyhow::Result<WindowHandle<Workspace>> {
+    let snapshot = SessionStore::loaded(cx);
+    let (mut openings, mut active) = workspace::restore::open(&snapshot, cx);
+    if openings.is_empty() {
+        log::info!("sessions: nothing is restored, so one home session opens");
+        let home = dirs::home_dir().ok_or_else(|| anyhow::anyhow!("app: no home folder"))?;
+        let launch = shell::launch(
+            &SettingsStore::get(cx).shell,
+            home,
+            &cx.global::<ShellIntegration>().0,
+        )?;
+        let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
+        let tabs = vec![Started {
+            pty,
+            events,
+            launch,
+        }];
+        openings.push(Opening::of(String::new(), 0, tabs));
+        active = 0;
+    }
+    open_layout(openings, active, cx)
+}
+
+/// Opens the main window on `openings`, showing `active`.
+fn open_layout(
+    openings: Vec<Opening>,
+    active: usize,
+    cx: &mut App,
+) -> anyhow::Result<WindowHandle<Workspace>> {
     let kept = opening_size(cx);
     // macOS grows a window by a point on a side whose edge falls on a half point.
     let centered = Bounds::centered(None, kept, cx);
@@ -130,7 +183,6 @@ pub fn open(launch: Launch, cx: &mut App) -> anyhow::Result<WindowHandle<Workspa
         window_background: background,
         ..Default::default()
     };
-    let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
     let window = cx.open_window(options, |window, cx| {
         window.set_app_id(APP_ID);
         window
@@ -138,7 +190,7 @@ pub fn open(launch: Launch, cx: &mut App) -> anyhow::Result<WindowHandle<Workspa
             .detach();
         cx.new(|cx| {
             keep_size(window, cx);
-            Workspace::new(pty, events, launch, window, cx)
+            Workspace::new(openings, active, window, cx)
         })
     })?;
     crate::pet::follow(window, cx);

@@ -49,14 +49,18 @@ impl Workspace {
         }
     }
 
-    pub(super) fn add_session(&mut self, tab: Tab) {
-        let id = tab.terminal.entity_id();
-        log::info!("app: session {id:?} opens");
+    pub(super) fn add_session(&mut self, name: String, active: usize, tabs: Vec<Tab>) {
+        let Some(first) = tabs.first() else {
+            log::error!("app: a session with no tab is not opened");
+            return;
+        };
+        let id = first.terminal.entity_id();
+        log::info!("app: session {id:?} opens with {} tabs", tabs.len());
         self.sessions.push(Session {
             id,
-            tabs: vec![tab],
-            active: 0,
-            name: String::new(),
+            tabs,
+            active,
+            name,
             editing: None,
             look: None,
         });
@@ -86,7 +90,7 @@ impl Workspace {
             Ok(((pty, events), launch)) => {
                 let tab = self.make_tab(pty, events, launch, window, cx);
                 if group {
-                    self.add_session(tab);
+                    self.add_session(String::new(), 0, vec![tab]);
                     self.select(self.sessions.len() - 1, window, cx);
                 } else {
                     let session = &mut self.sessions[self.active];
@@ -94,6 +98,7 @@ impl Workspace {
                     let index = session.tabs.len() - 1;
                     self.select_tab(index, window, cx);
                 }
+                self.note(true, cx);
             }
             Err(error) => log::error!("app: no new terminal: {error:#}"),
         }
@@ -159,6 +164,7 @@ impl Workspace {
         } else {
             cx.notify();
         }
+        self.note(true, cx);
     }
 
     pub(super) fn step_tab(&mut self, forward: bool, window: &mut Window, cx: &mut Context<Self>) {
@@ -263,6 +269,7 @@ impl Workspace {
                     session.tabs.insert(to, tab);
                     session.active = sessions::after_move(session.active, from, to);
                     log::debug!("app: session {group:?} moves tab {from} to {to}");
+                    this.note(true, cx);
                     cx.notify();
                 });
             });

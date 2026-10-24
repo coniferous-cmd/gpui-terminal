@@ -2,11 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use ely_gpui_component::Assets;
-use elyterminal::{
-    app,
-    settings::SettingsStore,
-    term::shell::{ShellIntegration, launch},
-};
+use elyterminal::app;
 use gpui::App;
 
 /// A Linux app with no display server fails at start instead of running headless.
@@ -22,13 +18,7 @@ fn application() -> gpui::Application {
 
 fn run(cx: &mut App) -> anyhow::Result<()> {
     app::start(cx)?;
-    let home = dirs::home_dir().ok_or_else(|| anyhow::anyhow!("app: no home folder"))?;
-    let launch = launch(
-        &SettingsStore::get(cx).shell,
-        home,
-        &cx.global::<ShellIntegration>().0,
-    )?;
-    app::open(launch, cx)?;
+    app::open_saved(cx)?;
     cx.activate(true);
     Ok(())
 }

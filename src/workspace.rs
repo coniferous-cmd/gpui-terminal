@@ -21,17 +21,19 @@ use crate::{
     menus,
     sessions::{self, Session, orb},
     settings::{PanelTab, Settings, SettingsStore, window::OpenSettings},
-    term::{Events, Launch, Pty},
 };
 
 mod closing;
 mod events;
 mod keys;
 mod rename;
+pub mod restore;
+mod save;
 mod tabs;
 mod widths;
 
 pub use keys::bind_keys;
+pub use restore::{Opening, Started};
 use widths::{Dragged, Side};
 
 actions!(
@@ -83,15 +85,18 @@ pub struct Workspace {
 }
 
 impl Workspace {
-    /// The window's content with its first session, `pty` started from `launch`.
+    /// The window's content holding the sessions `openings` describe, `active` shown.
     pub fn new(
-        pty: Pty,
-        events: Events,
-        launch: Launch,
+        openings: Vec<Opening>,
+        active: usize,
         window: &mut Window,
         cx: &mut Context<Self>,
     ) -> Self {
-        let git = cx.new(|cx| GitPanel::new(launch.cwd.clone(), window, cx));
+        let Some(first) = openings.first().and_then(|opening| opening.tabs.first()) else {
+            unreachable!("app: a window opens with at least one tab");
+        };
+        let folder = first.launch.cwd.clone();
+        let git = cx.new(|cx| GitPanel::new(folder.clone(), window, cx));
         // A change the Git panel made shows in Files' marks too.
         let acted = cx.subscribe(&git, |this, _, _: &Acted, cx| {
             let folder = this.sessions[this.active].current().folder.clone();
@@ -100,10 +105,10 @@ impl Workspace {
         let mut workspace = Self {
             focus: cx.focus_handle(),
             pointer: Default::default(),
-            sessions: Vec::new(),
+            sessions: Vec::with_capacity(openings.len()),
             active: 0,
             closing: None,
-            files: cx.new(|_| Files::new(launch.cwd.clone())),
+            files: cx.new(|_| Files::new(folder)),
             git,
             background: Blur::new(window, SettingsStore::get(cx)),
             dragged: Dragged::default(),
@@ -114,9 +119,21 @@ impl Workspace {
             }),
             _acted: acted,
         };
-        let tab = workspace.make_tab(pty, events, launch, window, cx);
-        workspace.add_session(tab);
-        workspace.select(0, window, cx);
+        for opening in openings {
+            let mut tabs = Vec::with_capacity(opening.tabs.len());
+            for started in opening.tabs {
+                tabs.push(workspace.make_tab(
+                    started.pty,
+                    started.events,
+                    started.launch,
+                    window,
+                    cx,
+                ));
+            }
+            workspace.add_session(opening.name, opening.active, tabs);
+        }
+        let active = active.min(workspace.sessions.len().saturating_sub(1));
+        workspace.select(active, window, cx);
         workspace
     }
 
@@ -170,6 +187,8 @@ impl Workspace {
         self.active = index;
         log::debug!("app: session {} shown", index + 1);
         self.retitle(window);
+        // The selection is kept in memory and written once, at quit.
+        self.note(false, cx);
         cx.notify();
     }
 
@@ -189,6 +208,8 @@ impl Workspace {
         );
         let Some(next) = sessions::after_close(self.active, index, self.sessions.len()) else {
             log::info!("app: no session left; the window closes");
+            // Nothing is kept but the empty layout, so the next start opens one home session.
+            self.note(true, cx);
             window.remove_window();
             return;
         };
@@ -199,6 +220,7 @@ impl Workspace {
         } else {
             cx.notify();
         }
+        self.note(true, cx);
     }
 
     /// Its sessions, in their rows' order.

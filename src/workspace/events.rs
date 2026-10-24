@@ -17,12 +17,15 @@ impl Workspace {
         };
         let shown = index == self.active && tab_index == self.sessions[index].active;
         let tab = &mut self.sessions[index].tabs[tab_index];
+        // A shell reports its folder at every prompt, so only a moved one reaches the file.
+        let mut moved = false;
         match event {
             TerminalEvent::Title(title) => {
                 log::debug!("app: tab {id:?}'s program names it {title:?}");
                 tab.title.clone_from(title);
             }
             TerminalEvent::Folder(folder) => {
+                moved = tab.folder.as_path() != folder.as_path();
                 tab.folder.clone_from(folder);
                 tab.reports = true;
                 if shown {
@@ -48,6 +51,9 @@ impl Workspace {
                 self.close_tab(index, tab_index, window, cx);
                 return;
             }
+        }
+        if moved {
+            self.note(true, cx);
         }
         if shown {
             self.retitle(window);
