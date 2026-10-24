@@ -168,3 +168,7 @@ Progress truth. Top to bottom, one at a time. A task is ticked only after its co
 ## 33. Release
 
 - [x] T64 Release v0.1.7 with T59 to T63, T65 and T66: version 0.1.7; the macOS disk image, the Windows zip and the Linux tarball, each from its script; the notes list what changed in English and Chinese.
+
+## 34. Session restore
+
+- [x] T69 The workspace survives a restart, which the owner asked for after 0.1.7: `sessions.json` beside `settings.json` keeps the sessions, their order, the tabs of each in their order, each tab's folder, the session and tab shown, and each session's name, and nothing else; it is written only when the layout changes and once at quit for the selection, through `src/atomic.rs`; start restores it, walking a folder that is gone to its nearest ancestor that is there, then to home, skipping a tab whose shell will not start, and dropping a file it cannot use with a log rather than stopping the start; closing every session leaves nothing to restore. `PRD.md`'s Deferred entry now names terminal history alone.

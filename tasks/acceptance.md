@@ -103,6 +103,9 @@ What no check reached: no real KWin drew the blur; of Wayland desktops, only Hyp
 | Last tab's close or program exit closes its session; last session closes the window | T67, T68 | `sessions::navigation` checks empty-group closure selection; runtime event paths share `close_tab`; interactive acceptance pending | Partial |
 | Closing a multi-tab session asks first | T67, T68 | Ely `ConfirmDialog`, keyed by stable session identity; interactive acceptance pending | Partial |
 | Hidden tabs mark their owning session; status aggregates all tabs | T67, T68 | `sessions::model` checks attention priority; notification activation locates the exact terminal entity; interactive acceptance pending | Partial |
+| The layout survives a restart: sessions, tabs, folders, selection and names; no history | T69 | `sessions::state` round-trips a layout; `workspace::restore` walks a deleted folder to its nearest ancestor, to home, and to itself; a macOS run from a scratch `HOME` brought back two sessions of two and one tabs, the renamed session's name, its second tab shown, and each shell in its folder, with `/gone/deep` fallen back to its parent; the start after it wrote nothing | Pass |
+| The layout is written only when it changes, and once at quit for the selection | T69 | `sessions::state::a_selection_alone_writes_nothing`, `a_layout_change_writes_once_and_not_again`, `an_empty_layout_writes_the_file_away` | Pass |
+| A snapshot that will not read is dropped with a log, never stopping the start | T69 | `sessions::state::*_drops_the_file`; `SessionStore::init` logs and opens one home session | Pass |
 
 ## 8. Right panel: Files
 

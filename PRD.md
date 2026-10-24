@@ -84,6 +84,7 @@ Ghostty is the bar for what the terminal does. ELYTerminal owns its engine on `a
 - A browser-style tab bar above the terminal: add, select, close and drag to reorder. Cmd-T adds a tab, Cmd-W closes it, Cmd-1…9 selects it, Ctrl-Tab and Ctrl-Shift-Tab cycle tabs; off macOS, Ctrl-Shift-T/W and Alt-1…9. Each session retains its selected tab.
 - Rename: a double press on a row's title opens a field in its place; Enter keeps the name, Escape drops it. The name shows in the row, the terminal's header and the window's title over the program's own until renamed again; an empty name gives the title back to the program.
 - A tab whose program ends closes. Closing or exiting the last tab automatically closes its session. The last session closing closes the window.
+- The layout survives a restart: the sessions, the order they stood in, the tabs of each in their order, the folder of each tab, the session and tab that were shown, and any name given a session come back as they were; no scrollback, screen content or running program does. A folder that is gone gives way to its nearest ancestor that is there, then the home folder. The layout is written only when it changes, and once at quit for the selection; closing every session leaves nothing to restore. It lives in `sessions.json` beside `settings.json`, and a file that will not read is logged and dropped, never stopping the start.
 - A bell in an unseen tab marks its session's row until that tab is shown. A session's status aggregates all its tabs, with waiting, error, working, done and idle in that priority order.
 - A row shows its session's status: working, with its progress where known; waiting on the user, for a permission, a question or a login; done; error; and a mark when the last command failed. Hover shows each record's program, title and message. A hidden session that starts waiting marks its row until it is shown.
 - The mark is 3 by 3 dots that move: work ripples, or fills by its progress; waiting dips; a settled state draws its shape, then holds still.
@@ -160,4 +161,4 @@ Cmd-, opens it; on Windows and Linux, which have no menu bar, so does a gear in 
 
 ## Deferred
 
-Splits, profiles, key rebinding, kitty graphics, sixel, session restore, push and pull, quick terminal.
+Splits, profiles, key rebinding, kitty graphics, sixel, restoring a terminal's history, push and pull, quick terminal.
