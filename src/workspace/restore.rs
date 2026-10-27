@@ -16,6 +16,7 @@ use crate::{
 
 /// A tab's running shell, its reports, and what it runs, before the window takes them.
 pub struct Started {
+    pub name: String,
     pub pty: Pty,
     pub events: Events,
     pub launch: Launch,
@@ -45,13 +46,14 @@ pub fn open(snapshot: &Snapshot, cx: &App) -> (Vec<Opening>, usize) {
         let mut active = 0;
         for (at, tab) in saved.tabs.iter().enumerate() {
             let folder = existing(Path::new(&tab.folder), home.as_deref());
-            let Some(started) = start(&folder, cx) else {
+            let Some(mut started) = start(&folder, cx) else {
                 continue;
             };
             // A tab that went before the shown one must not shift the one that was shown.
             if at == saved.active {
                 active = tabs.len();
             }
+            started.name = tab.name.clone();
             tabs.push(started);
         }
         if tabs.is_empty() {
@@ -91,6 +93,7 @@ fn start(folder: &Path, cx: &App) -> Option<Started> {
     .and_then(|launch| {
         let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(settings))?;
         Ok(Started {
+            name: String::new(),
             pty,
             events,
             launch,

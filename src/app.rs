@@ -126,6 +126,7 @@ pub fn open(launch: Launch, cx: &mut App) -> anyhow::Result<WindowHandle<Workspa
     SessionStore::forget(cx);
     let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
     let tabs = vec![Started {
+        name: String::new(),
         pty,
         events,
         launch,
@@ -147,6 +148,7 @@ pub fn open_saved(cx: &mut App) -> anyhow::Result<WindowHandle<Workspace>> {
         )?;
         let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
         let tabs = vec![Started {
+            name: String::new(),
             pty,
             events,
             launch,

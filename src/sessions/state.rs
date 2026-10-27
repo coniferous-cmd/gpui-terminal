@@ -40,6 +40,8 @@ pub struct SavedSession {
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct SavedTab {
+    #[serde(default)]
+    pub name: String,
     pub folder: String,
 }
 
@@ -48,6 +50,7 @@ impl SavedTab {
     pub fn new(folder: &Path) -> Option<Self> {
         match folder.to_str() {
             Some(folder) => Some(Self {
+                name: String::new(),
                 folder: folder.to_string(),
             }),
             None => {
@@ -263,6 +266,7 @@ mod tests {
 
     fn tab(folder: &str) -> SavedTab {
         SavedTab {
+            name: String::new(),
             folder: folder.into(),
         }
     }
@@ -295,6 +299,24 @@ mod tests {
         let left: Vec<_> = fs::read_dir(&folder).expect("folder").collect();
         assert_eq!(left.len(), 1, "only sessions.json remains");
         fs::remove_dir_all(folder).expect("cleanup");
+    }
+
+    #[test]
+    fn tab_names_round_trip_independently_of_session_names() {
+        let mut snapshot = layout();
+        snapshot.sessions[0].tabs[0].name = "服务端 API".into();
+        snapshot.sessions[0].tabs[1].name = "日志".into();
+        let folder = folder("tab-names");
+        let path = folder.join(FILE);
+        save(&path, &snapshot).expect("saves names");
+        assert_eq!(load(&path).expect("loads names"), Some(snapshot));
+        fs::remove_dir_all(folder).expect("cleanup");
+    }
+
+    #[test]
+    fn old_tabs_without_names_use_program_titles() {
+        let tab: SavedTab = serde_json::from_str(r#"{"folder":"/src"}"#).expect("old tab");
+        assert!(tab.name.is_empty());
     }
 
     #[test]

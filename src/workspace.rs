@@ -29,6 +29,8 @@ mod keys;
 mod rename;
 pub mod restore;
 mod save;
+mod tab_bar;
+mod tab_name;
 mod tabs;
 mod widths;
 
@@ -122,13 +124,10 @@ impl Workspace {
         for opening in openings {
             let mut tabs = Vec::with_capacity(opening.tabs.len());
             for started in opening.tabs {
-                tabs.push(workspace.make_tab(
-                    started.pty,
-                    started.events,
-                    started.launch,
-                    window,
-                    cx,
-                ));
+                let mut tab =
+                    workspace.make_tab(started.pty, started.events, started.launch, window, cx);
+                tab.name = started.name;
+                tabs.push(tab);
             }
             workspace.add_session(opening.name, opening.active, tabs);
         }

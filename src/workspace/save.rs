@@ -20,12 +20,13 @@ impl Workspace {
             let mut tabs = Vec::with_capacity(session.tabs.len());
             let mut shown = 0;
             for (at, tab) in session.tabs.iter().enumerate() {
-                let Some(saved) = SavedTab::new(&tab.folder) else {
+                let Some(mut saved) = SavedTab::new(&tab.folder) else {
                     continue;
                 };
                 if at == session.active {
                     shown = tabs.len();
                 }
+                saved.name = tab.name.clone();
                 tabs.push(saved);
             }
             if tabs.is_empty() {

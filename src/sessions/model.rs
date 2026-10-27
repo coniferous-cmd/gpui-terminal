@@ -23,6 +23,8 @@ pub struct Session {
 pub struct Tab {
     pub terminal: Entity<TerminalView>,
     pub title: String,
+    pub name: String,
+    pub editing: Option<(Entity<TextInput>, Subscription)>,
     pub folder: PathBuf,
     pub reports: bool,
     pub bell: bool,
@@ -32,7 +34,9 @@ pub struct Tab {
 
 impl Tab {
     pub fn named(&self) -> &str {
-        if self.title.is_empty() {
+        if !self.name.is_empty() {
+            &self.name
+        } else if self.title.is_empty() {
             TITLE
         } else {
             &self.title

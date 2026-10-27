@@ -1,6 +1,5 @@
 use ely_gpui_component::{
     primitives::IconName,
-    shell::{TabBar, WindowTab},
     theme::{ActiveTheme, ControlSize},
 };
 use gpui::{
@@ -8,7 +7,10 @@ use gpui::{
     StatefulInteractiveElement, Styled, Window, div, rems,
 };
 
-use super::Workspace;
+use super::{
+    Workspace,
+    tab_bar::{TabBar, WindowTab},
+};
 use crate::{
     sessions::{self, Session, Tab, orb::Look},
     settings::{SettingsStore, StartIn},
@@ -41,6 +43,8 @@ impl Workspace {
         Tab {
             terminal,
             title: String::new(),
+            name: String::new(),
+            editing: None,
             folder: launch.cwd,
             reports: launch.reports,
             bell: false,
@@ -216,14 +220,28 @@ impl Workspace {
                     _ => IconName::Terminal,
                 }
             };
-            bar = bar.tab(WindowTab::new(format!("{:?}", ids[index]), title).icon(icon));
+            let mut item = WindowTab::new(format!("{:?}", ids[index]), title).icon(icon);
+            if let Some((input, _)) = &tab.editing {
+                item = item.editor(self.tab_name_editor(ids[index], input, cx));
+            }
+            bar = bar.tab(item);
         }
         let select = cx.entity();
         let close = cx.entity();
         let add = cx.entity();
         let reorder = cx.entity();
         let close_ids = ids.clone();
+        let rename_ids = ids.clone();
+        let rename = cx.entity();
         let bar = bar
+            .on_rename(move |id, window, cx| {
+                if let Some(key) = rename_ids
+                    .iter()
+                    .find(|key| format!("{key:?}") == id.as_ref())
+                {
+                    rename.update(cx, |this, cx| this.rename_tab(*key, window, cx));
+                }
+            })
             .on_select(move |id, window, cx| {
                 let Some(index) = ids.iter().position(|key| format!("{key:?}") == id.as_ref())
                 else {
