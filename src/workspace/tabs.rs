@@ -62,6 +62,7 @@ impl Workspace {
         log::info!("app: session {id:?} opens with {} tabs", tabs.len());
         self.sessions.push(Session {
             id,
+            runtime_id: crate::cli::identity::next('s'),
             tabs,
             active,
             name,
@@ -76,36 +77,49 @@ impl Workspace {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        let Some(home) = dirs::home_dir() else {
-            log::error!("app: no home folder, so no new terminal");
-            return;
-        };
-        let settings = SettingsStore::get(cx);
-        let folder = match settings.start_in {
-            StartIn::Home => home,
-            StartIn::Session => self
-                .sessions
-                .get(self.active)
-                .map_or(home, |session| session.current().folder.clone()),
-        };
-        let started = launch(&settings.shell, folder, &cx.global::<ShellIntegration>().0)
-            .and_then(|launch| Ok((spawn(&launch, (80, 24), (8, 16), config(settings))?, launch)));
-        match started {
-            Ok(((pty, events), launch)) => {
-                let tab = self.make_tab(pty, events, launch, window, cx);
-                if group {
-                    self.add_session(String::new(), 0, vec![tab]);
-                    self.select(self.sessions.len() - 1, window, cx);
-                } else {
-                    let session = &mut self.sessions[self.active];
-                    session.tabs.push(tab);
-                    let index = session.tabs.len() - 1;
-                    self.select_tab(index, window, cx);
-                }
-                self.note(true, cx);
-            }
-            Err(error) => log::error!("app: no new terminal: {error:#}"),
+        if let Err(error) = self.create_terminal(group, None, String::new(), window, cx) {
+            log::error!("app: no new terminal: {error:#}");
         }
+    }
+
+    pub(super) fn create_terminal(
+        &mut self,
+        group: bool,
+        folder: Option<std::path::PathBuf>,
+        name: String,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) -> anyhow::Result<()> {
+        let settings = SettingsStore::get(cx);
+        let folder = match folder {
+            Some(folder) => folder,
+            None => match settings.start_in {
+                StartIn::Session if !self.sessions.is_empty() => {
+                    self.sessions[self.active].current().folder.clone()
+                }
+                _ => dirs::home_dir()
+                    .ok_or_else(|| anyhow::anyhow!("app: no home folder, so no new terminal"))?,
+            },
+        };
+        anyhow::ensure!(
+            folder.is_dir(),
+            "app: working directory is not a directory: {}",
+            folder.display()
+        );
+        let launch = launch(&settings.shell, folder, &cx.global::<ShellIntegration>().0)?;
+        let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(settings))?;
+        let tab = self.make_tab(pty, events, launch, window, cx);
+        if group {
+            self.add_session(name.trim().to_string(), 0, vec![tab]);
+            self.select(self.sessions.len() - 1, window, cx);
+        } else {
+            let session = &mut self.sessions[self.active];
+            session.tabs.push(tab);
+            let index = session.tabs.len() - 1;
+            self.select_tab(index, window, cx);
+        }
+        self.note(true, cx);
+        Ok(())
     }
 
     pub(super) fn select_tab(&mut self, index: usize, window: &mut Window, cx: &mut Context<Self>) {

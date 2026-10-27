@@ -2,6 +2,8 @@
 Set-Location (Join-Path $PSScriptRoot '..') -ErrorAction Stop
 cargo build --release --locked
 if ($LASTEXITCODE -ne 0) { throw "windows-zip: cargo build failed" }
+cargo build --release --locked --example cli_launcher
+if ($LASTEXITCODE -ne 0) { throw "windows-zip: CLI launcher build failed" }
 $version = ((cargo pkgid) -split '[#@]')[-1]
 if ($version -notmatch '^[0-9]') { throw "windows-zip: cargo pkgid names no version" }
 $arch = @{ AMD64 = 'x86_64'; ARM64 = 'aarch64' }[$env:PROCESSOR_ARCHITECTURE]
@@ -10,7 +12,8 @@ $target = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { 'target' }
 $out = Join-Path $target 'release'
 $zip = Join-Path $out "luna-terminal-$version-windows-$arch.zip"
 & (Join-Path $PSScriptRoot 'windows-conpty.ps1') -Directory $out
-$files = @('luna-terminal.exe', 'conpty.dll', 'OpenConsole.exe', 'conpty.txt') |
+Copy-Item -Force (Join-Path $out 'examples/cli_launcher.exe') (Join-Path $out 'luna-terminal.com') -ErrorAction Stop
+$files = @('luna-terminal.exe', 'luna-terminal.com', 'conpty.dll', 'OpenConsole.exe', 'conpty.txt') |
     ForEach-Object { Join-Path $out $_ }
 Compress-Archive -Force -Path $files -DestinationPath $zip -ErrorAction Stop
 Write-Output "windows-zip: $zip"

@@ -57,12 +57,7 @@ impl Workspace {
         if !keep {
             log::debug!("app: session {pid} keeps its name");
         } else {
-            session.name = input.read(cx).text().trim().to_string();
-            if session.name.is_empty() {
-                log::info!("app: session {pid} takes its program's title again");
-            } else {
-                log::info!("app: session {pid} is named {:?}", session.name);
-            }
+            Self::set_session_name(session, input.read(cx).text());
         }
         if held && let Some(shown) = self.sessions.get(self.active) {
             window.focus(&shown.current().terminal.focus_handle(cx), cx);
@@ -70,5 +65,17 @@ impl Workspace {
         self.note(true, cx);
         self.retitle(window);
         cx.notify();
+    }
+
+    pub(super) fn set_session_name(session: &mut crate::sessions::Session, name: &str) {
+        session.name = name.trim().to_string();
+        if session.name.is_empty() {
+            log::info!(
+                "app: session {:?} takes its program's title again",
+                session.id
+            );
+        } else {
+            log::info!("app: session {:?} is named {:?}", session.id, session.name);
+        }
     }
 }

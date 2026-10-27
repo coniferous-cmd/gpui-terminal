@@ -87,7 +87,9 @@ pub fn start(cx: &mut App) -> anyhow::Result<()> {
         {
             log::info!("app: no terminal window left; quitting");
             SessionStore::flush(cx);
-            cx.quit();
+            if !crate::cli::service::defer_quit(cx) {
+                cx.quit();
+            }
         }
     })
     .detach();

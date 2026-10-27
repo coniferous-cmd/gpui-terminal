@@ -19,6 +19,7 @@ fn application() -> gpui::Application {
 fn run(cx: &mut App) -> anyhow::Result<()> {
     app::start(cx)?;
     app::open_saved(cx)?;
+    luna_terminal::cli::service::start(cx)?;
     cx.activate(true);
     Ok(())
 }
@@ -28,6 +29,9 @@ fn main() {
         env_logger::Env::default().default_filter_or("luna_terminal=info"),
     )
     .init();
+    if let Some(code) = luna_terminal::cli::dispatch() {
+        std::process::exit(code);
+    }
     application().with_assets(Assets).run(|cx: &mut App| {
         ely_gpui_component::init(cx).expect("Ely failed to start");
         if let Err(error) = run(cx) {

@@ -1,6 +1,7 @@
 pub mod app;
 pub mod atomic;
 pub mod blur;
+pub mod cli;
 pub mod files;
 pub mod git;
 pub mod menus;

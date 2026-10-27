@@ -24,6 +24,7 @@ use crate::{
 };
 
 mod closing;
+mod control;
 mod events;
 mod keys;
 mod rename;
@@ -68,6 +69,7 @@ pub const TITLE: &str = "luna-terminal";
 
 /// The main window's content: sessions, the terminal, and Git or Files, in Ely's columns.
 pub struct Workspace {
+    runtime_id: String,
     focus: FocusHandle,
     pub(crate) pointer: crate::pet::gaze::Pointer,
     sessions: Vec<Session>,
@@ -105,6 +107,7 @@ impl Workspace {
             this.files.update(cx, |files, cx| files.show(&folder, cx));
         });
         let mut workspace = Self {
+            runtime_id: crate::cli::identity::next('w'),
             focus: cx.focus_handle(),
             pointer: Default::default(),
             sessions: Vec::with_capacity(openings.len()),

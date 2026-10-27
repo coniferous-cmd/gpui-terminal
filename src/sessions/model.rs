@@ -12,6 +12,7 @@ use crate::{term::TerminalView, workspace::TITLE};
 /// A group of independent terminals, retaining its selected tab.
 pub struct Session {
     pub id: EntityId,
+    pub runtime_id: String,
     pub tabs: Vec<Tab>,
     pub active: usize,
     pub name: String,
