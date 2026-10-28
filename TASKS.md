@@ -160,6 +160,10 @@ Progress truth. Top to bottom, one at a time. A task is ticked only after its co
 - [x] T63 A double-click on a session's title renames it, which a user asked for after 0.1.6: the row's title turns into a field, Enter keeps the name, Escape drops it; the name shows in the row, the terminal's header and the window's title over the program's own until renamed again, and an empty name gives the title back to the program; it lives as long as the session.
 - [x] T65 Dragging the window on Windows 10 with Background blur on follows the pointer, which a user found lagging seconds behind in issue #3 after 0.1.5: find where the lag comes from in gpui's acrylic path, fix the cause on Windows 10 alone, log what changes, and reply on the issue.
 
+## Session launch directory
+
+- [ ] T70 Retain each session's creation cwd for all new tabs, persist it independently of live tab folders, and reject old layouts missing it. Implementation and unit checks are in `speckit/changes/session-tab-cwd/`; interactive acceptance and full checks remain pending.
+
 ## Session tabs
 
 - [x] T67 Sessions group independent terminal tabs: Ely's tab bar adds, selects, closes and reorders tabs; each session retains its selection; the last tab's close or exit closes its session, and the last session closes the window. Multi-tab session closure asks first; Files, Git and notification activation follow the exact tab, and session status aggregates its tabs.

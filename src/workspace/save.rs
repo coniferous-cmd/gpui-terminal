@@ -33,14 +33,14 @@ impl Workspace {
                 log::info!("app: session {:?} keeps no tab", session.id);
                 continue;
             }
+            let Some(saved) = SavedSession::new(&session.cwd, session.name.clone(), shown, tabs)
+            else {
+                continue;
+            };
             if index == self.active {
                 active = sessions.len();
             }
-            sessions.push(SavedSession {
-                name: session.name.clone(),
-                active: shown,
-                tabs,
-            });
+            sessions.push(saved);
         }
         Snapshot { active, sessions }
     }

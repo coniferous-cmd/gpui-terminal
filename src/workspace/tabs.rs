@@ -1,3 +1,6 @@
+use std::path::PathBuf;
+
+use anyhow::Context as _;
 use ely_gpui_component::{
     primitives::IconName,
     theme::{ActiveTheme, ControlSize},
@@ -13,13 +16,15 @@ use super::{
 };
 use crate::{
     sessions::{self, Session, Tab, orb::Look},
-    settings::{SettingsStore, StartIn},
+    settings::SettingsStore,
     term::{
         Events, Launch, Pty, TerminalView, config,
         shell::{ShellIntegration, launch},
         spawn,
     },
 };
+
+mod directory;
 
 impl Workspace {
     pub(super) fn make_tab(
@@ -53,16 +58,27 @@ impl Workspace {
         }
     }
 
-    pub(super) fn add_session(&mut self, name: String, active: usize, tabs: Vec<Tab>) {
+    pub(super) fn add_session(
+        &mut self,
+        name: String,
+        cwd: PathBuf,
+        active: usize,
+        tabs: Vec<Tab>,
+    ) {
         let Some(first) = tabs.first() else {
             log::error!("app: a session with no tab is not opened");
             return;
         };
         let id = first.terminal.entity_id();
-        log::info!("app: session {id:?} opens with {} tabs", tabs.len());
+        log::info!(
+            "app: session {id:?} opens with {} tabs, launch cwd {}",
+            tabs.len(),
+            cwd.display()
+        );
         self.sessions.push(Session {
             id,
             runtime_id: crate::cli::identity::next('s'),
+            cwd,
             tabs,
             active,
             name,
@@ -91,26 +107,39 @@ impl Workspace {
         cx: &mut Context<Self>,
     ) -> anyhow::Result<()> {
         let settings = SettingsStore::get(cx);
-        let folder = match folder {
-            Some(folder) => folder,
-            None => match settings.start_in {
-                StartIn::Session if !self.sessions.is_empty() => {
-                    self.sessions[self.active].current().folder.clone()
-                }
-                _ => dirs::home_dir()
-                    .ok_or_else(|| anyhow::anyhow!("app: no home folder, so no new terminal"))?,
-            },
-        };
+        let current = self.sessions.get(self.active);
+        let folder = directory::resolve(
+            group,
+            folder,
+            settings.start_in,
+            current.map(|session| session.cwd.as_path()),
+            current.map(|session| session.current().folder.as_path()),
+            dirs::home_dir,
+        )?;
         anyhow::ensure!(
             folder.is_dir(),
-            "app: working directory is not a directory: {}",
+            "app: cannot create {}: working directory is not a directory: {}",
+            if group { "session" } else { "tab" },
             folder.display()
         );
-        let launch = launch(&settings.shell, folder, &cx.global::<ShellIntegration>().0)?;
-        let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(settings))?;
+        let context = || {
+            format!(
+                "app: cannot create {} in {}",
+                if group { "session" } else { "tab" },
+                folder.display()
+            )
+        };
+        let launch = launch(
+            &settings.shell,
+            folder.clone(),
+            &cx.global::<ShellIntegration>().0,
+        )
+        .with_context(context)?;
+        let (pty, events) =
+            spawn(&launch, (80, 24), (8, 16), config(settings)).with_context(context)?;
         let tab = self.make_tab(pty, events, launch, window, cx);
         if group {
-            self.add_session(name.trim().to_string(), 0, vec![tab]);
+            self.add_session(name.trim().to_string(), folder, 0, vec![tab]);
             self.select(self.sessions.len() - 1, window, cx);
         } else {
             let session = &mut self.sessions[self.active];

@@ -126,6 +126,7 @@ pub fn start(cx: &mut App) -> anyhow::Result<()> {
 /// Opens the main window running `launch` as one session of one tab, keeping no layout.
 pub fn open(launch: Launch, cx: &mut App) -> anyhow::Result<WindowHandle<Workspace>> {
     SessionStore::forget(cx);
+    let cwd = launch.cwd.clone();
     let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
     let tabs = vec![Started {
         name: String::new(),
@@ -133,7 +134,7 @@ pub fn open(launch: Launch, cx: &mut App) -> anyhow::Result<WindowHandle<Workspa
         events,
         launch,
     }];
-    open_layout(vec![Opening::of(String::new(), 0, tabs)], 0, cx)
+    open_layout(vec![Opening::of(String::new(), cwd, 0, tabs)], 0, cx)
 }
 
 /// Opens the main window on the layout the last quit left, or one home session when none is left.
@@ -145,7 +146,7 @@ pub fn open_saved(cx: &mut App) -> anyhow::Result<WindowHandle<Workspace>> {
         let home = dirs::home_dir().ok_or_else(|| anyhow::anyhow!("app: no home folder"))?;
         let launch = shell::launch(
             &SettingsStore::get(cx).shell,
-            home,
+            home.clone(),
             &cx.global::<ShellIntegration>().0,
         )?;
         let (pty, events) = spawn(&launch, (80, 24), (8, 16), config(SettingsStore::get(cx)))?;
@@ -155,7 +156,7 @@ pub fn open_saved(cx: &mut App) -> anyhow::Result<WindowHandle<Workspace>> {
             events,
             launch,
         }];
-        openings.push(Opening::of(String::new(), 0, tabs));
+        openings.push(Opening::of(String::new(), home, 0, tabs));
         active = 0;
     }
     open_layout(openings, active, cx)

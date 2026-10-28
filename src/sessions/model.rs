@@ -13,6 +13,7 @@ use crate::{term::TerminalView, workspace::TITLE};
 pub struct Session {
     pub id: EntityId,
     pub runtime_id: String,
+    pub cwd: PathBuf,
     pub tabs: Vec<Tab>,
     pub active: usize,
     pub name: String,

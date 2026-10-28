@@ -18,6 +18,9 @@ use luna_terminal::{
     workspace::{CloseTab, NewTab, SelectTab},
 };
 
+#[path = "cwd.rs"]
+mod cwd;
+
 enum Step {
     NewTab,
     SelectFirstTab,
@@ -252,6 +255,8 @@ fn check(root: &Path, gui: &mut Gui) -> anyhow::Result<()> {
         sessions()?[0].id == *first,
         "session ID changed after original tab closed"
     );
+    cwd::check(root, gui)?;
+    command(&["focus", first])?;
     let cwd = root.to_str().unwrap();
     let created = command(&["create", "--name", " backend ", "--cwd", cwd])?
         .trim()

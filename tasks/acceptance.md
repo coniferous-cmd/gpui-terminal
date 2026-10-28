@@ -4,6 +4,15 @@
 
 What no check reached: no real KWin drew the blur; of Wayland desktops, only Hyprland, on the owner's Omarchy, has drawn it. On 2026-10-15 macOS gave `shot` the window's ground alone, for old and new builds alike, while the terminal it ran under lacked Screen Recording (`CGPreflightScreenCaptureAccess` false); that day's macOS checks read the app's log.
 
+## Session launch cwd (T70)
+
+| Behavior | Evidence | Status |
+|---|---|---|
+| New tabs use their session's retained creation cwd, not live tab folders or Start in | `workspace::tabs::directory` unit tests; partial macOS CLI live run observed four shell launches in the retained directory after folder reports and original-tab closure | Partial |
+| Session cwd and tab folders round-trip independently; old layouts are rejected whole | `sessions::state::tests`: round-trip, required/invalid cwd, mixed old/new layout and non-UTF-8 tests pass | Pass |
+| New-tab launch failure preserves the session; restart and GUI controls behave correctly | Extended `tests/cli_live/cwd.rs`; full desktop run blocked by earlier close-first timeout; restart/button/reorder checks outstanding | Open |
+| Full suite and supported platforms | macOS non-shell library tests pass; full check blocked by missing pwsh and earlier timeout; Windows/Linux not exercised for this change | Partial |
+
 ## 1. Product
 
 | PRD line | Task | Evidence | Status |

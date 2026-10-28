@@ -132,7 +132,7 @@ impl Workspace {
                 tab.name = started.name;
                 tabs.push(tab);
             }
-            workspace.add_session(opening.name, opening.active, tabs);
+            workspace.add_session(opening.name, opening.cwd, opening.active, tabs);
         }
         let active = active.min(workspace.sessions.len().saturating_sub(1));
         workspace.select(active, window, cx);

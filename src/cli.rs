@@ -45,7 +45,7 @@ pub enum SessionCommand {
         /// Set a custom session name.
         #[arg(long)]
         name: Option<String>,
-        /// Start in this directory; relative paths use the CLI's working directory.
+        /// Retain this directory for new tabs; relative paths use the CLI's cwd.
         #[arg(long, value_name = "DIRECTORY")]
         cwd: Option<PathBuf>,
         /// Select a target when multiple terminal windows are running.

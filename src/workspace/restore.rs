@@ -25,14 +25,20 @@ pub struct Started {
 /// A session to open: its name, the tab it shows, and its tabs.
 pub struct Opening {
     pub name: String,
+    pub cwd: PathBuf,
     pub active: usize,
     pub tabs: Vec<Started>,
 }
 
 impl Opening {
     /// One session holding `tabs`, `active` shown.
-    pub fn of(name: String, active: usize, tabs: Vec<Started>) -> Self {
-        Self { name, active, tabs }
+    pub fn of(name: String, cwd: PathBuf, active: usize, tabs: Vec<Started>) -> Self {
+        Self {
+            name,
+            cwd,
+            active,
+            tabs,
+        }
     }
 }
 
@@ -75,6 +81,7 @@ pub fn open(snapshot: &Snapshot, cx: &App) -> (Vec<Opening>, usize) {
         }
         openings.push(Opening {
             name: saved.name.clone(),
+            cwd: PathBuf::from(&saved.cwd),
             active,
             tabs,
         });
